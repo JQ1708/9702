@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Quantities & Units</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --secondary: #50E3C2;
+            --accent: #F5A623;
+            --dark: #333;
+            --light: #f9f9f9;
+            --danger: #E74C3C;
+            --success: #2ECC71;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent; /* iPad optimization */
+        }
+
+        /* --- Navigation & Mind Map --- */
+        header {
+            background: linear-gradient(135deg, var(--primary), #2c3e50);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; }
+        
+        .mindmap-container {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: white;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .mm-node {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+            user-select: none;
+        }
+
+        .mm-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .mm-node.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            transform: translateY(1px);
+        }
+
+        .mm-start {
+            background: white;
+            border-color: var(--accent);
+            color: var(--accent);
+            width: 100%;
+            max-width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .mm-start.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* --- Content Sections --- */
+        .section-content {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto 50px auto;
+            padding: 0 15px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .section-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Custom Math Formatting --- */
+        .math-eq {
+            font-style: italic;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.15em;
+            background: #eef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+            color: #222;
+        }
+
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 4px;
+            font-size: 0.9em;
+        }
+        .fraction > span { display: block; padding: 0 2px; }
+        .numerator { border-bottom: 1px solid currentColor; margin-bottom: 1px; }
+        .denominator { margin-top: 1px; }
+        
+        .multiply { margin: 0 3px; font-family: sans-serif; }
+        
+        .sqrt-container { 
+            white-space: nowrap; 
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .sqrt-symbol { 
+            font-size: 1.2em; 
+            vertical-align: top;
+            line-height: 1;
+        }
+        .sqrt-content { 
+            border-top: 1px solid currentColor; 
+            padding-top: 2px; 
+            margin-left: -2px; 
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        sup { 
+            vertical-align: super; 
+            font-size: 0.7em; 
+            line-height: 0;
+            position: relative;
+            top: -0.3em;
+        }
+        
+        sub {
+            vertical-align: sub;
+            font-size: 0.7em;
+            line-height: 0;
+            position: relative;
+            bottom: -0.2em;
+        }
+
+        /* --- Interactive Elements --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--secondary);
+            transition: transform 0.2s;
+        }
+        
+        .info-card:hover { transform: scale(1.02); }
+
+        .highlight-keyword {
+            font-weight: bold;
+            color: var(--primary);
+            background: rgba(74, 144, 226, 0.1);
+            padding: 0 4px;
+            border-radius: 4px;
+            cursor: help;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .accordion {
+            background-color: white;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            transition: 0.4s;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion:after { content: '\002B'; color: #777; font-weight: bold; float: right; margin-left: 5px; }
+        .accordion.active:after { content: "\2212"; }
+        .accordion.active, .accordion:hover { background-color: #e8f4fd; color: var(--primary); }
+
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+
+        /* --- Tables --- */
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .styled-table thead tr {
+            background-color: var(--primary);
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th, .styled-table td { padding: 12px 15px; }
+        .styled-table tbody tr { border-bottom: 1px solid #dddddd; }
+        .styled-table tbody tr:nth-of-type(even) { background-color: #f3f3f3; }
+        .styled-table tbody tr:last-of-type { border-bottom: 2px solid var(--primary); }
+
+        /* --- Diagrams --- */
+        .diagram-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+        }
+        
+        .diagram-title { font-weight: bold; margin-bottom: 10px; color: #555; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+
+        svg { max-width: 100%; height: auto; }
+
+        /* --- Quiz --- */
+        .quiz-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 40px;
+            border: 2px solid var(--accent);
+        }
+
+        .quiz-header {
+            background: var(--accent);
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .question-box { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #eee; }
+        .options label { display: block; padding: 10px; background: #f9f9f9; margin: 5px 0; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .options input { margin-right: 10px; }
+        .options label:hover { background: #eee; }
+        
+        .correct-answer { background-color: rgba(46, 204, 113, 0.2) !important; border: 1px solid var(--success); color: darken(var(--success), 20%); }
+        .wrong-answer { background-color: rgba(231, 76, 60, 0.2) !important; border: 1px solid var(--danger); }
+        .feedback { font-size: 0.9em; margin-top: 5px; font-weight: bold; }
+
+        /* --- Specific Elements --- */
+        .floating-word {
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+
+        .circle-highlight {
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            padding: 2px 6px;
+            display: inline-block;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Physical Quantities & Units</h1>
+</header>
+
+<!-- Step-by-Step Mind Map -->
+<div class="mindmap-container">
+    <div class="mm-node mm-start" data-target="sec-intro">START HERE</div>
+    <div class="mm-node" data-target="sec-physical">1. Physical Quantities</div>
+    <div class="mm-node" data-target="sec-si">2. SI Units</div>
+    <div class="mm-node" data-target="sec-scalars">3. Scalars & Vectors</div>
+    <div class="mm-node" data-target="sec-errors">4. Errors & Uncertainties</div>
+</div>
+
+<!-- ================= SECTION 1: PHYSICAL QUANTITIES ================= -->
+<div id="sec-physical" class="section-content">
+    <h2>1. Physical Quantities</h2>
+    
+    <div class="info-card">
+        <h3>What is a physical quantity?</h3>
+        <p>Speed and velocity are examples of physical quantities; both can be measured.</p>
+        <ul style="list-style-type: none; padding-left: 0;">
+            <li>✅ All physical quantities consist of a <span class="highlight-keyword">numerical magnitude</span> and a <span class="highlight-keyword">unit</span>.</li>
+            <li>In physics, every letter of the alphabet (and most Greek) is used to represent these.</li>
+            <li>To represent a physical quantity, it <strong>must</strong> contain both a numerical value and the unit.</li>
+        </ul>
+        <div style="background: #e3f2fd; padding: 10px; border-radius: 8px; margin-top: 10px;">
+            <p><strong>Example:</strong> The letter <span class="math-eq">v</span> can represent:</p>
+            <ul>
+                <li>Velocity (Unit: m s<sup>-1</sup>)</li>
+                <li>Volume (Unit: m<sup>3</sup>)</li>
+                <li>Voltage (Unit: V)</li>
+            </ul>
+            <p><em>The units provide the context!</em></p>
+        </div>
+    </div>
+
+    <h3>Estimating Physical Quantities</h3>
+    <p>It is useful to know these to make estimates. <strong>Memorise this table:</strong></p>
+    
+    <table class="styled-table">
+        <thead>
+            <tr><th>Quantity</th><th>Size (Estimate)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Diameter of an atom</td><td>10<sup>-10</sup> m</td></tr>
+            <tr><td>Wavelength of UV radiation</td><td>10 nm</td></tr>
+            <tr><td>Height of an adult human</td><td>2 m</td></tr>
+            <tr><td>Distance between Earth and Sun (1 AU)</td><td>1.5 <span class="multiply">×</span> 10<sup>11</sup> m</td></tr>
+            <tr><td>Mass of a hydrogen atom</td><td>10<sup>-27</sup> kg</td></tr>
+            <tr><td>Mass of an adult human</td><td>70 kg</td></tr>
+            <tr><td>Mass of a car</td><td>1000 kg</td></tr>
+            <tr><td>Seconds in a day</td><td>90 000 s</td></tr>
+            <tr><td>Seconds in a year</td><td>3 <span class="multiply">×</span> 10<sup>7</sup> s</td></tr>
+            <tr><td>Speed of sound in air</td><td>300 m s<sup>-1</sup></td></tr>
+            <tr><td>Power of a light bulb</td><td>60 W</td></tr>
+            <tr><td>Atmospheric pressure</td><td>1 <span class="multiply">×</span> 10<sup>5</sup> Pa</td></tr>
+        </tbody>
+    </table>
+
+    <div class="info-card" style="border-left-color: var(--accent);">
+        <h3>📝 Worked Example: Energy to walk up stairs</h3>
+        <p><strong>Question:</strong> Estimate the energy required for an adult man to walk up a flight of stairs.</p>
+        <button class="accordion">Step 1: Recall Equation</button>
+        <div class="panel">
+            <p>Recall the equation for gain in gravitational potential energy:</p>
+            <p class="math-eq">&Delta;E<sub>p</sub> = m g &Delta;h</p>
+            <p>Here, <span class="math-eq">g</span> is approximately 10 N kg<sup>-1</sup>.</p>
+        </div>
+
+        <button class="accordion">Step 2: Estimate Values</button>
+        <div class="panel">
+            <ul>
+                <li>An adult person mass <span class="math-eq">m</span> &approx; <strong>70 kg</strong></li>
+                <li>A flight of stairs height <span class="math-eq">h</span> &approx; <strong>3 m</strong></li>
+            </ul>
+            <div class="diagram-container">
+                <div class="diagram-title">Diagram: Man on Stairs</div>
+                <!-- Placeholder/Simple SVG for Man on Stairs -->
+                <svg width="200" height="150" viewBox="0 0 200 150">
+                    <path d="M20 130 L60 130 L60 100 L100 100 L100 70 L140 70 L140 40 L180 40" fill="none" stroke="#333" stroke-width="2"/>
+                    <text x="150" y="80" font-size="12">Height &approx; 3m</text>
+                    <circle cx="30" cy="110" r="5" fill="#e74c3c"/>
+                    <line x1="30" y1="115" x2="30" y2="125" stroke="#e74c3c" stroke-width="2"/> 
+                    <text x="10" y="100" font-size="10">Mass &approx; 70kg</text>
+                </svg>
+            </div>
+        </div>
+
+        <button class="accordion">Step 3: Substitute</button>
+        <div class="panel">
+            <p>The energy required is approximately:</p>
+            <p class="math-eq">&Delta;E<sub>p</sub> = 70 <span class="multiply">×</span> 10 <span class="multiply">×</span> 3 = 2100 J</p>
+            <p><em>Tip: Mark schemes are generous with estimate ranges.</em></p>
+        </div>
+    </div>
+
+    <!-- QUIZ SECTION 1 -->
+    <div class="quiz-container">
+        <div class="quiz-header">QUIZ: Physical Quantities</div>
+        <div id="quiz-sec1"></div>
+    </div>
+</div>
+
+<!-- ================= SECTION 2: SI UNITS ================= -->
+<div id="sec-si" class="section-content">
+    <h2>2. SI Units</h2>
+
+    <div class="card-grid">
+        <div class="info-card">
+            <h3>SI Base Units</h3>
+            <p>All units can be reduced to 7 base units. You only need these 5:</p>
+            <ul style="list-style: none;">
+                <li>⚖️ <strong>Mass:</strong> kilogram (<span class="highlight-keyword">kg</span>)</li>
+                <li>📏 <strong>Length:</strong> metre (<span class="highlight-keyword">m</span>)</li>
+                <li>⏱️ <strong>Time:</strong> second (<span class="highlight-keyword">s</span>)</li>
+                <li>⚡ <strong>Current:</strong> ampere (<span class="highlight-keyword">A</span>)</li>
+                <li>🌡️ <strong>Temperature:</strong> kelvin (<span class="highlight-keyword">K</span>)</li>
+            </ul>
+        </div>
+        <div class="info-card">
+            <h3>Derived Units</h3>
+            <p>Combinations of base units.</p>
+            <p><strong>Newton (N)</strong> (Force = ma):<br>
+            <span class="math-eq">kg m s<sup>-2</sup></span></p>
+            
+            <p><strong>Joule (J)</strong> (Energy = <span class="fraction"><span class="numerator">1</span><span>2</span></span>mv<sup>2</sup>):<br>
+            <span class="math-eq">kg m<sup>2</sup> s<sup>-2</sup></span></p>
+
+            <p><strong>Pascal (Pa)</strong> (Pressure = <span class="fraction"><span class="numerator">Force</span><span>Area</span></span>):<br>
+            <span class="math-eq">kg m<sup>-1</sup> s<sup>-2</sup></span></p>
+        </div>
+    </div>
+
+    <h3>Homogeneity of Physical Equations</h3>
+    <p>We use base units to check if an equation is physically correct. <span class="circle-highlight">Units on Left = Units on Right</span>.</p>
+
+    <div class="info-card">
+        <h4>📝 Worked Example: Homogeneity</h4>
+        <p><strong>Question:</strong> The speed of sound <span class="math-eq">v</span> is given by <span class="math-eq">v = <span class="sqrt-container"><span class="sqrt-symbol">&radic;</span><span class="sqrt-content"><span class="fraction"><span class="numerator">&gamma; p</span><span>&rho;</span></span></span></span></span>. Show that <span class="math-eq">&gamma;</span> has no units.</p>
+        
+        <button class="accordion">Step 1: Units on Left</button>
+        <div class="panel"><p>Speed <span class="math-eq">v</span> = <strong>m s<sup>-1</sup></strong></p></div>
+
+        <button class="accordion">Step 2: Units of Pressure (p) and Density (&rho;)</button>
+        <div class="panel">
+            <p>Pressure <span class="math-eq">p = <span class="fraction"><span class="numerator">F</span><span>A</span></span> = N m<sup>-2</sup> = (kg m s<sup>-2</sup>) m<sup>-2</sup></span> = <strong>kg m<sup>-1</sup> s<sup>-2</sup></strong></p>
+            <p>Density <span class="math-eq">&rho; = <span class="fraction"><span class="numerator">m</span><span>V</span></span></span> = <strong>kg m<sup>-3</sup></strong></p>
+        </div>
+
+        <button class="accordion">Step 3: Equate</button>
+        <div class="panel">
+            <p>Let units of &gamma; be G.</p>
+            <p class="math-eq">m s<sup>-1</sup> = <span class="sqrt-container"><span class="sqrt-symbol">&radic;</span><span class="sqrt-content"><span class="fraction"><span class="numerator">G <span class="multiply">×</span> kg m<sup>-1</sup> s<sup>-2</sup></span><span>kg m<sup>-3</sup></span></span></span></span></p>
+            <p>Simplify fraction: <span class="fraction"><span class="numerator">kg</span><span>kg</span></span> cancels. <span class="math-eq"><span class="fraction"><span class="numerator">m<sup>-1</sup></span><span>m<sup>-3</sup></span></span> = m<sup>2</sup></span>.</p>
+            <p><span class="math-eq">m s<sup>-1</sup> = <span class="sqrt-container"><span class="sqrt-symbol">&radic;</span><span class="sqrt-content">G m<sup>2</sup> s<sup>-2</sup></span></span> = <span class="sqrt-container"><span class="sqrt-symbol">&radic;</span><span class="sqrt-content">G</span></span> <span class="multiply">×</span> m s<sup>-1</sup></span></p>
+            <p>Therefore, <span class="sqrt-container"><span class="sqrt-symbol">&radic;</span><span class="sqrt-content">G</span></span> = 1, so <strong>G = 1 (No units)</strong>.</p>
+        </div>
+    </div>
+
+    <h3>Powers of Ten (Prefixes)</h3>
+    <p>Memorise these prefixes for large and small values:</p>
+    <div style="overflow-x:auto;">
+    <table class="styled-table">
+        <tr><th>Prefix</th><th>Symbol</th><th>Power</th></tr>
+        <tr><td>Tera</td><td>T</td><td>10<sup>12</sup></td></tr>
+        <tr><td>Giga</td><td>G</td><td>10<sup>9</sup></td></tr>
+        <tr><td>Mega</td><td>M</td><td>10<sup>6</sup></td></tr>
+        <tr><td>Kilo</td><td>k</td><td>10<sup>3</sup></td></tr>
+        <tr><td>Centi</td><td>c</td><td>10<sup>-2</sup></td></tr>
+        <tr><td>Milli</td><td>m</td><td>10<sup>-3</sup></td></tr>
+        <tr><td>Micro</td><td>&mu;</td><td>10<sup>-6</sup></td></tr>
+        <tr><td>Nano</td><td>n</td><td>10<sup>-9</sup></td></tr>
+        <tr><td>Pico</td><td>p</td><td>10<sup>-12</sup></td></tr>
+    </table>
+    </div>
+
+    <!-- QUIZ SECTION 2 -->
+    <div class="quiz-container">
+        <div class="quiz-header">QUIZ: SI Units</div>
+        <div id="quiz-sec2"></div>
+    </div>
+</div>
+
+<!-- ================= SECTION 3: SCALARS & VECTORS ================= -->
+<div id="sec-scalars" class="section-content">
+    <h2>3. Scalars & Vectors</h2>
+
+    <div class="card-grid">
+        <div class="info-card" style="border-left-color: #F5A623;">
+            <h3>Scalars</h3>
+            <p>Quantities that have <span class="highlight-keyword">MAGNITUDE</span> but <span style="text-decoration: underline red wavy;">NO DIRECTION</span>.</p>
+            <p><em>Examples:</em> Mass, Distance, Speed, Time, Energy, Volume, Density, Pressure, Electric Charge, Temperature.</p>
+        </div>
+        <div class="info-card" style="border-left-color: #2ECC71;">
+            <h3>Vectors</h3>
+            <p>Quantities that have <span class="highlight-keyword">BOTH MAGNITUDE AND DIRECTION</span>.</p>
+            <p><em>Examples:</em> Weight, Displacement, Velocity, Acceleration, Force, Momentum.</p>
+        </div>
+    </div>
+
+    <h3>Distance vs Displacement</h3>
+    <div class="diagram-container">
+        <div class="diagram-title">Distance (Path) vs Displacement (Straight Line)</div>
+        <svg viewBox="0 0 400 200" width="100%">
+            <!-- Path -->
+            <path d="M 50 150 Q 100 50 200 100 T 350 50" fill="none" stroke="#aaa" stroke-width="3" stroke-dasharray="5,5"/>
+            <text x="180" y="80" fill="#777">Distance (Scalar)</text>
+            
+            <!-- Displacement -->
+            <line x1="50" y1="150" x2="350" y2="50" stroke="#E74C3C" stroke-width="4" marker-end="url(#arrowhead)"/>
+            <text x="200" y="140" fill="#E74C3C" font-weight="bold">Displacement (Vector)</text>
+            
+            <!-- Points -->
+            <circle cx="50" cy="150" r="5" fill="#333"/>
+            <text x="40" y="170">Start</text>
+            <circle cx="350" cy="50" r="5" fill="#333"/>
+            <text x="340" y="40">Finish</text>
+            
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#E74C3C" />
+                </marker>
+            </defs>
+        </svg>
+    </div>
+    <ul>
+        <li><strong>Distance:</strong> Total length of path taken. (Scalar)</li>
+        <li><strong>Displacement:</strong> Straight line length and direction from start to finish. (Vector)</li>
+    </ul>
+
+    <h3>Combining Vectors</h3>
+    <p>Two methods: Triangle Method and Parallelogram Method.</p>
+    
+    <div class="info-card">
+        <h4>Triangle Method (Head-to-Tail)</h4>
+        <ol>
+            <li>Link vectors Head-to-Tail.</li>
+            <li>Resultant connects tail of first to head of second.</li>
+        </ol>
+        <div class="diagram-container">
+            <svg viewBox="0 0 300 150" width="100%">
+                <line x1="50" y1="100" x2="150" y2="100" stroke="#333" stroke-width="3" marker-end="url(#arrow-black)"/>
+                <text x="100" y="120">a</text>
+                <line x1="150" y1="100" x2="200" y2="50" stroke="#333" stroke-width="3" marker-end="url(#arrow-black)"/>
+                <text x="180" y="70">b</text>
+                <line x1="50" y1="100" x2="200" y2="50" stroke="#E74C3C" stroke-width="4" stroke-dasharray="4" marker-end="url(#arrow-red)"/>
+                <text x="100" y="60" fill="#E74C3C">a + b</text>
+                
+                <defs>
+                    <marker id="arrow-black" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#333" /></marker>
+                    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#E74C3C" /></marker>
+                </defs>
+            </svg>
+        </div>
+    </div>
+
+    <h3>Equilibrium</h3>
+    <p>If forces are in equilibrium, they form a <span class="highlight-keyword">CLOSED VECTOR TRIANGLE</span>.</p>
+
+    <div class="info-card">
+        <h3>Resolving Vectors</h3>
+        <p>A single vector <span class="math-eq">F</span> can be split into vertical and horizontal components.</p>
+        <div class="diagram-container">
+            <svg viewBox="0 0 200 150" width="200">
+                <!-- Axes -->
+                <line x1="20" y1="130" x2="180" y2="130" stroke="#aaa" stroke-width="1"/>
+                <line x1="20" y1="130" x2="20" y2="20" stroke="#aaa" stroke-width="1"/>
+                
+                <!-- Vector -->
+                <line x1="20" y1="130" x2="150" y2="50" stroke="#333" stroke-width="3" marker-end="url(#arrow-black)"/>
+                <text x="90" y="80">F</text>
+                
+                <!-- Angle -->
+                <path d="M 50 130 A 30 30 0 0 0 45 115" fill="none" stroke="#333"/>
+                <text x="55" y="125">&theta;</text>
+                
+                <!-- Components -->
+                <line x1="20" y1="130" x2="150" y2="130" stroke="blue" stroke-width="2" stroke-dasharray="4"/>
+                <text x="80" y="145" fill="blue">F<sub>x</sub> = F cos &theta;</text>
+                
+                <line x1="150" y1="130" x2="150" y2="50" stroke="green" stroke-width="2" stroke-dasharray="4"/>
+                <text x="155" y="100" fill="green">F<sub>y</sub> = F sin &theta;</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- QUIZ SECTION 3 -->
+    <div class="quiz-container">
+        <div class="quiz-header">QUIZ: Scalars & Vectors</div>
+        <div id="quiz-sec3"></div>
+    </div>
+</div>
+
+<!-- ================= SECTION 4: ERRORS & UNCERTAINTIES ================= -->
+<div id="sec-errors" class="section-content">
+    <h2>4. Errors & Uncertainties</h2>
+
+    <div class="info-card">
+        <h3>Errors Types</h3>
+        <table class="styled-table">
+            <thead><tr><th>Type</th><th>Random Error</th><th>Systematic Error</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Cause</strong></td><td>Unpredictable fluctuations, environmental conditions.</td><td>Faulty instrument, flaws in method.</td></tr>
+                <tr><td><strong>Effect</strong></td><td>Affects <span class="highlight-keyword">PRECISION</span> (spread about mean).</td><td>Affects <span class="highlight-keyword">ACCURACY</span> (all readings shifted).</td></tr>
+                <tr><td><strong>Reduction</strong></td><td>Repeat measurements and calculate average.</td><td>Recalibrate instruments, adjust technique.</td></tr>
+                <tr><td><strong>Example</strong></td><td>Reading fluctuates.</td><td>Zero error (reading not zero when empty).</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Precision vs Accuracy</h3>
+    <div class="diagram-container" style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <div style="width: 150px;">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#333"/>
+                <circle cx="50" cy="50" r="30" fill="none" stroke="#333"/>
+                <circle cx="50" cy="50" r="15" fill="none" stroke="#333"/>
+                <circle cx="60" cy="40" r="2" fill="red"/><circle cx="55" cy="45" r="2" fill="red"/><circle cx="65" cy="42" r="2" fill="red"/>
+                <text x="50" y="95" text-anchor="middle" font-size="10">Precise, Not Accurate</text>
+            </svg>
+        </div>
+        <div style="width: 150px;">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#333"/>
+                <circle cx="50" cy="50" r="30" fill="none" stroke="#333"/>
+                <circle cx="50" cy="50" r="15" fill="none" stroke="#333"/>
+                <circle cx="50" cy="50" r="2" fill="red"/><circle cx="48" cy="52" r="2" fill="red"/><circle cx="52" cy="48" r="2" fill="red"/>
+                <text x="50" y="95" text-anchor="middle" font-size="10">Accurate & Precise</text>
+            </svg>
+        </div>
+    </div>
+    
+    <h3>Calculating Uncertainty</h3>
+    <div class="info-card">
+        <ul>
+            <li><strong>Reading (e.g. Voltmeter):</strong> &pm; half the smallest division.</li>
+            <li><strong>Measurement (e.g. Ruler):</strong> &pm; at least 1 smallest division (due to two ends).</li>
+            <li><strong>Repeated Data:</strong> &pm; <span class="fraction"><span class="numerator">1</span><span>2</span></span>(Range).</li>
+            <li><strong>Digital Reading:</strong> &pm; last significant digit.</li>
+        </ul>
+        <p><strong>Example:</strong> Mean 12.50 cm, Range 0.10 cm. <br> Result: <span class="math-eq">12.50 &pm; 0.05 cm</span>.</p>
+    </div>
+
+    <h3>Combining Uncertainties</h3>
+    <div class="card-grid">
+        <div class="info-card">
+            <h4>Adding / Subtracting</h4>
+            <p>ADD the <span class="highlight-keyword">ABSOLUTE</span> uncertainties.</p>
+            <p>If <span class="math-eq">y = a - b</span></p>
+            <p>Uncertainty <span class="math-eq">&Delta;y = &Delta;a + &Delta;b</span></p>
+        </div>
+        <div class="info-card">
+            <h4>Multiplying / Dividing</h4>
+            <p>ADD the <span class="highlight-keyword">PERCENTAGE</span> uncertainties.</p>
+            <p>If <span class="math-eq">v = <span class="fraction"><span class="numerator">d</span><span>t</span></span></span></p>
+            <p><span class="math-eq">%&Delta;v = %&Delta;d + %&Delta;t</span></p>
+        </div>
+        <div class="info-card">
+            <h4>Powers</h4>
+            <p>MULTIPLY % uncertainty by power.</p>
+            <p>If <span class="math-eq">V = r<sup>3</sup></span></p>
+            <p><span class="math-eq">%&Delta;V = 3 <span class="multiply">×</span> %&Delta;r</span></p>
+        </div>
+    </div>
+
+    <!-- QUIZ SECTION 4 -->
+    <div class="quiz-container">
+        <div class="quiz-header">QUIZ: Errors & Uncertainties</div>
+        <div id="quiz-sec4"></div>
+    </div>
+</div>
+
+<!-- Intro Section (Landing) -->
+<div id="sec-intro" class="section-content active" style="text-align:center;">
+    <h2>Welcome</h2>
+    <p>Select a topic from the Mind Map above to begin studying.</p>
+    <div style="font-size: 50px;">👈 👆 👉</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Navigation Logic ---
+        const buttons = document.querySelectorAll('.mm-node');
+        const sections = document.querySelectorAll('.section-content');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default if any
+                const targetId = btn.getAttribute('data-target');
+                
+                // 1. Update Buttons State
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // 2. Update Content State
+                sections.forEach(s => s.classList.remove('active'));
+                const targetSection = document.getElementById(targetId);
+                
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        // Initialize active state for Start button
+        const startBtn = document.querySelector('.mm-start');
+        if (startBtn) startBtn.classList.add('active');
+
+        // --- Accordion Logic ---
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+    });
+
+    // --- Quiz Data & Engine ---
+    const quizData = {
+        sec1: [
+            { q: "Which of these is a physical quantity?", options: ["Metre", "Velocity", "Second", "Kilo"], a: 1 },
+            { q: "What is the estimated diameter of an atom?", options: ["10⁻⁶ m", "10⁻¹⁰ m", "10⁻¹⁵ m", "10⁻⁹ m"], a: 1 },
+            { q: "What is the unit of Potential Difference (Voltage)?", options: ["A", "J", "V", "W"], a: 2 },
+            { q: "Estimate the mass of an adult human.", options: ["500 kg", "70 kg", "10 kg", "200 kg"], a: 1 },
+            { q: "Which letter typically represents velocity?", options: ["V", "v", "u", "s"], a: 1 },
+            { q: "Estimate the height of a flight of stairs.", options: ["1 m", "3 m", "10 m", "0.5 m"], a: 1 },
+            { q: "What is the approximate speed of sound in air?", options: ["3 × 10⁸ m s⁻¹", "300 m s⁻¹", "100 m s⁻¹", "1000 m s⁻¹"], a: 1 },
+            { q: "Estimate atmospheric pressure.", options: ["1 × 10⁵ Pa", "100 Pa", "1000 Pa", "1 × 10⁶ Pa"], a: 0 },
+            { q: "What two things must a physical quantity have?", options: ["Number & Magnitude", "Magnitude & Unit", "Unit & Direction", "Size & Weight"], a: 1 },
+            { q: "Estimate the power of a light bulb.", options: ["6 W", "60 W", "600 W", "6000 W"], a: 1 }
+        ],
+        sec2: [
+            { q: "Which is an SI Base Unit?", options: ["Newton", "Joule", "Ampere", "Coulomb"], a: 2 },
+            { q: "What is the base unit for Temperature?", options: ["Celsius", "Fahrenheit", "Kelvin", "Degree"], a: 2 },
+            { q: "Express Newton (N) in base units.", options: ["kg m s⁻¹", "kg m s⁻²", "kg m² s⁻²", "kg m⁻¹"], a: 1 },
+            { q: "What is the prefix for 10⁹?", options: ["Mega", "Giga", "Tera", "Kilo"], a: 1 },
+            { q: "What is the symbol for Micro?", options: ["m", "M", "μ", "n"], a: 2 },
+            { q: "Check Homogeneity: If x = ut + <span class='fraction'><span class='numerator'>1</span><span>2</span></span>at², what are units of <span class='fraction'><span class='numerator'>1</span><span>2</span></span>at²?", options: ["m s⁻¹", "m s", "m", "s"], a: 2 },
+            { q: "What quantity has the unit Pascal?", options: ["Force", "Energy", "Pressure", "Power"], a: 2 },
+            { q: "Which is NOT a base unit?", options: ["Second", "Metre", "Joule", "Kilogram"], a: 2 },
+            { q: "What is 10⁻¹²?", options: ["Nano", "Pico", "Femto", "Micro"], a: 1 },
+            { q: "Is 'Force' a base or derived quantity?", options: ["Base", "Derived", "Neither", "Both"], a: 1 }
+        ],
+        sec3: [
+            { q: "Which is a Scalar quantity?", options: ["Velocity", "Displacement", "Force", "Distance"], a: 3 },
+            { q: "Which is a Vector quantity?", options: ["Speed", "Mass", "Acceleration", "Energy"], a: 2 },
+            { q: "Displacement is...", options: ["Total path length", "Straight line start to finish", "Always positive", "Speed × Time"], a: 1 },
+            { q: "How do you combine vectors tail-to-tail?", options: ["Triangle Method", "Parallelogram Method", "Square Method", "Linear Method"], a: 1 },
+            { q: "If forces are in equilibrium, the vector triangle is...", options: ["Open", "Closed", "Right-angled", "Parallel"], a: 1 },
+            { q: "Horizontal component of force F at angle θ?", options: ["F tan θ", "F sin θ", "F cos θ", "<span class='fraction'><span class='numerator'>F</span><span>cos θ</span></span>"], a: 2 },
+            { q: "Vertical component of force F at angle θ?", options: ["F cos θ", "F sin θ", "F tan θ", "<span class='fraction'><span class='numerator'>F</span><span>sin θ</span></span>"], a: 1 },
+            { q: "Mass is a...", options: ["Vector", "Scalar", "Force", "Unit"], a: 1 },
+            { q: "Velocity describes...", options: ["How fast only", "Direction only", "How fast and direction", "Distance per time"], a: 2 },
+            { q: "Resultant of 3N and 4N at right angles?", options: ["7N", "1N", "5N", "12N"], a: 2 }
+        ],
+        sec4: [
+            { q: "What kind of error causes unpredictable fluctuations?", options: ["Systematic", "Random", "Zero", "Parallax"], a: 1 },
+            { q: "How do you reduce random errors?", options: ["Recalibrate", "Repeat & Average", "Subtract zero error", "Use digital meter"], a: 1 },
+            { q: "Zero error is an example of...", options: ["Random error", "Systematic error", "Human error", "Precision"], a: 1 },
+            { q: "Precision refers to...", options: ["Closeness to true value", "Closeness of readings to each other", "Correctness", "Zero error"], a: 1 },
+            { q: "Uncertainty of a digital reading?", options: ["±0.1", "±0.5", "± Last significant digit", "± Range/2"], a: 2 },
+            { q: "Uncertainty of an analogue reading (e.g. thermometer)?", options: ["Half smallest division", "Smallest division", "Range", "Zero"], a: 0 },
+            { q: "How to find uncertainty in repeated data?", options: ["Mean", "Range", "<span class='fraction'><span class='numerator'>Range</span><span>2</span></span>", "Smallest value"], a: 2 },
+            { q: "When adding quantities (y=a+b), what do you add?", options: ["Percentage uncertainties", "Absolute uncertainties", "Fractional uncertainties", "Values only"], a: 1 },
+            { q: "When multiplying (y=ab), what do you add?", options: ["Absolute uncertainties", "Percentage uncertainties", "Errors", "Ranges"], a: 1 },
+            { q: "If V = r³, uncertainty in V is...", options: ["3 + %Δr", "3 × %Δr", "<span class='fraction'><span class='numerator'>%Δr</span><span>3</span></span>", "(%Δr)³"], a: 1 }
+        ]
+    };
+
+    function renderQuiz(id, data) {
+        const container = document.getElementById(id);
+        let html = '';
+        data.forEach((item, index) => {
+            html += `
+            <div class="question-box">
+                <p><strong>Q${index + 1}:</strong> ${item.q}</p>
+                <div class="options" id="${id}-q${index}">
+                    ${item.options.map((opt, i) => `
+                        <label onclick="checkAnswer('${id}', ${index}, ${i}, ${item.a}, this)">
+                            <input type="radio" name="${id}-q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="feedback" id="${id}-fb${index}"></div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkAnswer(quizId, qIndex, selected, correct, labelEl) {
+        const feedback = document.getElementById(`${quizId}-fb${qIndex}`);
+        const allLabels = document.getElementById(`${quizId}-q${qIndex}`).querySelectorAll('label');
+        
+        // Reset styles
+        allLabels.forEach(l => {
+            l.classList.remove('correct-answer', 'wrong-answer');
+        });
+
+        if (selected === correct) {
+            labelEl.classList.add('correct-answer');
+            feedback.innerHTML = "<span style='color:var(--success)'>Correct! 🎉</span>";
+        } else {
+            labelEl.classList.add('wrong-answer');
+            // Highlight correct one
+            allLabels[correct].classList.add('correct-answer');
+            feedback.innerHTML = "<span style='color:var(--danger)'>Incorrect. Try again!</span>";
+        }
+    }
+
+    // Initialize
+    renderQuiz('quiz-sec1', quizData.sec1);
+    renderQuiz('quiz-sec2', quizData.sec2);
+    renderQuiz('quiz-sec3', quizData.sec3);
+    renderQuiz('quiz-sec4', quizData.sec4);
+
+</script>
+
+</body>
+</html>
