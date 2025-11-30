@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kinematics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Comic+Neue:wght@700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* iPad specific optimizations */
+        .ipad-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Keyword Highlights */
+        .kw-bold { font-weight: 700; color: #1a202c; }
+        .kw-italic { font-style: italic; color: #4a5568; }
+        .kw-circle { border: 2px solid #e53e3e; border-radius: 50%; padding: 0 4px; display: inline-block; }
+        .kw-underline { border-bottom: 2px solid #3182ce; }
+        .kw-color-red { color: #e53e3e; }
+        .kw-color-blue { color: #3182ce; }
+        .kw-color-green { color: #38a169; }
+        .kw-float { display: inline-block; animation: float 3s ease-in-out infinite; }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Custom Math Formatting */
+        .math-eq { font-style: italic; font-family: 'Times New Roman', serif; }
+        .fraction { display: inline-block; vertical-align: middle; text-align: center; font-size: 0.9em; }
+        .fraction > span { display: block; padding: 0.1em; }
+        .fraction span.numerator { border-bottom: 1px solid #000; }
+        .fraction span.denominator { border-top: 1px solid #000; margin-top: -1px; }
+        .sqrt { border-top: 1px solid #000; padding-top: 1px; display: inline-block; position: relative; }
+        .sqrt::before { content: "√"; font-family: initial; position: absolute; left: -10px; top: -1px; display: none; } /* Custom root shape drawn in SVG usually better but css trick: */
+        .sqrt-symbol { font-size: 1.2em; vertical-align: top; margin-right: -2px;}
+        .power { vertical-align: super; font-size: 0.7em; }
+
+        /* Navigation / Mind Map */
+        .mindmap-node {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .mindmap-node:active { transform: scale(0.95); }
+
+        /* Quiz Styling */
+        .quiz-btn {
+            background-color: #4299e1; color: white; padding: 10px 20px; border-radius: 12px;
+            font-weight: bold; width: 100%; text-align: left; margin-bottom: 8px;
+            transition: background 0.3s;
+        }
+        .quiz-btn.correct { background-color: #48bb78; }
+        .quiz-btn.wrong { background-color: #f56565; }
+
+        /* Diagram Placeholder */
+        .placeholder-diagram {
+            border: 2px dashed #cbd5e0;
+            background: #edf2f7;
+            color: #718096;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .topic-section { display: none; }
+        .topic-section.active { display: block; animation: fadeIn 0.5s; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards */
+        .note-card {
+            background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3182ce;
+        }
+
+        .svg-container { text-align: center; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<!-- MAIN MENU (MIND MAP) -->
+<div id="mindmap" class="ipad-container min-h-screen flex flex-col items-center justify-center bg-blue-50">
+    <h1 class="text-4xl font-bold mb-8 text-blue-900 tracking-tight">Kinematics</h1>
+    <p class="mb-8 text-gray-600 text-center">Tap a node to start learning</p>
+    
+    <div class="relative w-full max-w-2xl h-[600px] bg-white rounded-3xl shadow-xl p-4 overflow-hidden relative">
+        <!-- Connecting Lines (SVG) -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 0;">
+            <line x1="50%" y1="50%" x2="20%" y2="20%" stroke="#cbd5e0" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="80%" y2="20%" stroke="#cbd5e0" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="20%" y2="80%" stroke="#cbd5e0" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="80%" y2="80%" stroke="#cbd5e0" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="50%" y2="10%" stroke="#cbd5e0" stroke-width="2" />
+        </svg>
+
+        <!-- Center Node -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div class="w-32 h-32 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-center shadow-lg animate-pulse">
+                START<br>HERE
+            </div>
+        </div>
+
+        <!-- Nodes -->
+        <div onclick="showSection('sec1')" class="mindmap-node absolute top-[10%] left-[50%] transform -translate-x-1/2 w-40 p-4 bg-green-100 rounded-xl border-2 border-green-400 text-center text-green-800 font-semibold shadow-md z-10">
+            Displacement,<br>Velocity & Accel.
+        </div>
+
+        <div onclick="showSection('sec2')" class="mindmap-node absolute top-[20%] left-[10%] w-40 p-4 bg-purple-100 rounded-xl border-2 border-purple-400 text-center text-purple-800 font-semibold shadow-md z-10">
+            Motion<br>Graphs
+        </div>
+
+        <div onclick="showSection('sec3')" class="mindmap-node absolute top-[20%] right-[10%] w-40 p-4 bg-yellow-100 rounded-xl border-2 border-yellow-400 text-center text-yellow-800 font-semibold shadow-md z-10">
+            Deriving<br>Equations
+        </div>
+
+        <div onclick="showSection('sec4')" class="mindmap-node absolute bottom-[20%] left-[10%] w-40 p-4 bg-red-100 rounded-xl border-2 border-red-400 text-center text-red-800 font-semibold shadow-md z-10">
+            Solving<br>Problems
+        </div>
+
+        <div onclick="showSection('sec5')" class="mindmap-node absolute bottom-[20%] right-[10%] w-40 p-4 bg-orange-100 rounded-xl border-2 border-orange-400 text-center text-orange-800 font-semibold shadow-md z-10">
+            Free Fall<br>Experiment
+        </div>
+        
+        <div onclick="showSection('sec6')" class="mindmap-node absolute bottom-[5%] left-[50%] transform -translate-x-1/2 w-40 p-4 bg-indigo-100 rounded-xl border-2 border-indigo-400 text-center text-indigo-800 font-semibold shadow-md z-10">
+            Projectile<br>Motion
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 1: Displacement, Velocity & Acceleration -->
+<div id="sec1" class="topic-section ipad-container pb-20">
+    <button onclick="showMindMap()" class="mb-4 text-blue-600 font-bold flex items-center">← Back to Map</button>
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">Displacement, Velocity & Acceleration</h2>
+
+    <!-- Distance vs Displacement -->
+    <div class="note-card">
+        <h3 class="text-xl font-bold mb-4 text-indigo-700">Distance and Displacement</h3>
+        
+        <div class="mb-4">
+            <span class="kw-bold kw-underline kw-color-blue">Distance:</span>
+            <ul class="list-disc pl-5 mt-2 space-y-2">
+                <li>Distance is a measure of <span class="kw-italic">how far</span> an object travels.</li>
+                <li>It is a <span class="kw-bold kw-color-red">scalar</span> quantity with magnitude <span class="kw-bold">only</span>.</li>
+            </ul>
+        </div>
+
+        <!-- SVG 1: 300m Race -->
+        <div class="svg-container bg-gray-50 rounded-lg p-4">
+            <svg viewBox="0 0 400 200" class="w-full max-w-md mx-auto">
+                <!-- Track -->
+                <rect x="50" y="50" width="300" height="100" rx="50" fill="none" stroke="#718096" stroke-width="20" opacity="0.2"/>
+                <rect x="50" y="50" width="300" height="100" rx="50" fill="none" stroke="#2d3748" stroke-width="2" stroke-dasharray="10 5"/>
+                
+                <!-- Start/Finish Labels -->
+                <text x="200" y="190" text-anchor="middle" font-weight="bold" font-size="14">300 m RACE</text>
+                
+                <!-- Runners path (Red) -->
+                <path d="M 200 50 L 300 50 A 50 50 0 0 1 350 100 A 50 50 0 0 1 300 150 L 100 150 A 50 50 0 0 1 50 100" 
+                      fill="none" stroke="#e53e3e" stroke-width="4" marker-end="url(#arrowred)"/>
+                
+                <!-- Displacement (Green) -->
+                <line x1="200" y1="50" x2="50" y2="100" stroke="#38a169" stroke-width="4" stroke-dasharray="5 5" marker-end="url(#arrowgreen)" opacity="0" /> <!-- Simplified logic for visual -->
+                
+                <!-- Visual representation of 300m point -->
+                <circle cx="200" cy="50" r="5" fill="black" />
+                <text x="200" y="40" text-anchor="middle" font-size="12">START</text>
+                
+                <circle cx="50" cy="100" r="5" fill="black" />
+                <text x="30" y="100" text-anchor="end" font-size="12">FINISH (300m mark)</text>
+
+                <!-- Arrows definitions -->
+                <defs>
+                    <marker id="arrowred" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#e53e3e" />
+                    </marker>
+                    <marker id="arrowgreen" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#38a169" />
+                    </marker>
+                </defs>
+            </svg>
+            <p class="text-sm text-center mt-2 italic text-gray-500">The athletes run a total <span class="font-bold text-red-500">distance</span> of 300 m.</p>
+        </div>
+
+        <div class="mb-4">
+            <span class="kw-bold kw-underline kw-color-blue">Displacement:</span>
+            <ul class="list-disc pl-5 mt-2 space-y-2">
+                <li>Displacement is a measure of how far something is from its <span class="kw-bold">starting position</span>, along with its <span class="kw-bold">direction</span>.</li>
+                <li>In other words, it is the <span class="kw-italic">change in position</span>.</li>
+                <li>It is a <span class="kw-bold kw-color-red">vector</span> quantity with <span class="kw-circle">both</span> magnitude and direction.</li>
+            </ul>
+        </div>
+        
+        <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400 my-4">
+            <p class="font-bold">Total Distance vs Total Displacement Example:</p>
+            <ul class="list-disc pl-5 mt-2 text-sm">
+                <li>Consider athletes running a 300 m race on a 400 m track.</li>
+                <li>Total <span class="font-bold">Distance</span> = 300 m.</li>
+                <li>Final <span class="font-bold">Displacement</span> = 100 m to the right (if they end 100m from start).</li>
+                <li>If they ran full 400 m, final displacement would be <span class="font-bold text-red-600">zero</span>.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Speed and Velocity -->
+    <div class="note-card">
+        <h3 class="text-xl font-bold mb-4 text-indigo-700">Speed and Velocity</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h4 class="font-bold text-center text-blue-600">Speed</h4>
+                <ul class="list-disc pl-5 text-sm mt-2">
+                    <li>The distance traveled <span class="kw-bold">every second</span>.</li>
+                    <li><span class="kw-bold">Scalar</span> quantity (magnitude only).</li>
+                    <li class="mt-2 text-center math-eq">
+                        average speed = 
+                        <div class="fraction">
+                            <span class="numerator">total distance</span>
+                            <span class="denominator">time taken</span>
+                        </div>
+                    </li>
+                    <li class="mt-2">SI Units: meters per second (m s<sup class="power">-1</sup>).</li>
+                </ul>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <h4 class="font-bold text-center text-purple-600">Velocity</h4>
+                <ul class="list-disc pl-5 text-sm mt-2">
+                    <li>The rate of change of <span class="kw-bold">displacement</span>.</li>
+                    <li><span class="kw-bold">Vector</span> quantity (magnitude + direction).</li>
+                    <li>Speed in a given direction.</li>
+                    <li class="mt-2 text-center math-eq">
+                        v<sub>avg</sub> = 
+                        <div class="fraction">
+                            <span class="numerator">&Delta;x</span>
+                            <span class="denominator">&Delta;t</span>
+                        </div>
+                    </li>
+                    <li class="mt-2 text-center math-eq text-xs">
+                        (if u and v known): v<sub>avg</sub> = 
+                        <div class="fraction">
+                            <span class="numerator">u + v</span>
+                            <span class="denominator">2</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="mt-4 bg-blue-50 p-3 rounded text-sm text-blue-800">
+            <span class="font-bold">Examiner Tip:</span> Velocity is speed in a given direction, but <span class="italic">average velocity</span> is NOT average speed in a given direction. Speed uses distance; Velocity uses displacement.
+        </div>
+    </div>
+
+    <!-- Acceleration -->
+    <div class="note-card">
+        <h3 class="text-xl font-bold mb-4 text-indigo-700">Acceleration</h3>
+        <p>Defined as: <span class="kw-bold kw-italic">The rate of change of velocity</span>.</p>
+        <p class="mt-2">It is a <span class="kw-bold">vector</span> quantity measured in m s<sup class="power">-2</sup>.</p>
+        
+        <div class="my-4 text-center bg-gray-100 p-4 rounded math-eq">
+            a = 
+            <div class="fraction">
+                <span class="numerator">&Delta;v</span>
+                <span class="denominator">&Delta;t</span>
+            </div>
+            =
+            <div class="fraction">
+                <span class="numerator">v - u</span>
+                <span class="denominator">t</span>
+            </div>
+        </div>
+        <p class="text-sm text-gray-600 text-center">Where v = final velocity, u = initial velocity.</p>
+    </div>
+
+    <!-- Worked Example -->
+    <div class="note-card border-l-green-500">
+        <h3 class="text-lg font-bold text-green-700 mb-2">Worked Example: Professor's Walk</h3>
+        <p class="text-sm mb-2">A professor walks path ABCDA around her garden.</p>
+        
+        <!-- Professor SVG -->
+        <div class="svg-container">
+            <svg viewBox="0 0 300 150" class="w-full max-w-sm mx-auto">
+                <rect x="50" y="20" width="200" height="100" fill="none" stroke="#2d3748" stroke-width="2"/>
+                <text x="40" y="20" font-weight="bold">A</text>
+                <text x="260" y="20" font-weight="bold">B</text>
+                <text x="260" y="130" font-weight="bold">C</text>
+                <text x="40" y="130" font-weight="bold">D</text>
+                <text x="150" y="15" font-size="12">15 km</text>
+                <text x="265" y="70" font-size="12" writing-mode="tb">9 km</text>
+            </svg>
+        </div>
+
+        <div class="bg-green-50 p-3 rounded text-sm">
+            <p><span class="font-bold">Calculate Distance:</span> Sum of all sides: 15 + 9 + 15 + 9 = <span class="font-bold">48 km</span>.</p>
+            <p class="mt-2"><span class="font-bold">Calculate Displacement:</span> She travels back to A. Distance from original position is 0. Displacement = <span class="font-bold">0 km</span>.</p>
+        </div>
+    </div>
+
+    <!-- Quiz Section 1 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-2xl font-bold text-center mb-6 text-blue-600">Quiz: Displacement & Velocity</h3>
+        <div id="quiz-container-1"></div>
+    </div>
+</div>
+
+<!-- SECTION 2: Motion Graphs -->
+<div id="sec2" class="topic-section ipad-container pb-20">
+    <button onclick="showMindMap()" class="mb-4 text-blue-600 font-bold">← Back to Map</button>
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">Motion Graphs</h2>
+
+    <!-- Distance-Time Graphs -->
+    <div class="note-card">
+        <h3 class="text-xl font-bold mb-4 text-purple-700">Distance-Time Graphs</h3>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><span class="kw-bold text-blue-600">Slope</span> equals <span class="kw-bold">speed</span>.</li>
+            <li>y-intercept equals initial position.</li>
+            <li>Straight (diagonal) line = constant speed.</li>
+            <li>Curved line = acceleration.</li>
+            <li>Slope always zero or positive (distance is scalar).</li>
+            <li>Horizontal line = <span class="kw-italic">State of rest</span>.</li>
+        </ul>
+    </div>
+
+    <!-- Displacement-Time Graphs -->
+    <div class="note-card">
+        <h3 class="text-xl font-bold mb-4 text-purple-700">Displacement-Time Graphs</h3>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><span class="kw-bold text-blue-600">Slope</span> equals <span class="kw-bold">velocity</span>.</li>
+            <li>Positive slope = motion in positive direction.</li>
+            <li>Negative slope = motion in negative direction.</li>
+        </ul>
+
+        <!-- SVG Graphs Row 1 -->
+        <div class="flex flex-wrap justify-around mt-4">
+            <div class="w-1/3 p-1">
+                <svg viewBox="0 0 100 100" class="w-full bg-white border border-gray-300">
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="1" /> <!-- x axis -->
+                    <line x1="10" y1="90" x2="10" y2="10" stroke="black" stroke-width="1" /> <!-- y axis -->
+                    <line x1="10" y1="90" x2="90" y2="10" stroke="blue" stroke-width="2" />
+                    <text x="50" y="98" font-size="8" text-anchor="middle">Time</text>
+                    <text x="5" y="50" font-size="8" transform="rotate(-90 5,50)" text-anchor="middle">Disp</text>
+                </svg>
+                <p class="text-[10px] text-center font-bold">Constant Velocity</p>
+            </div>
+            <div class="w-1/3 p-1">
+                <svg viewBox="0 0 100 100" class="w-full bg-white border border-gray-300">
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="1" />
+                    <line x1="10" y1="90" x2="10" y2="10" stroke="black" stroke-width="1" />
+                    <path d="M 10 90 Q 50 80 90 10" fill="none" stroke="blue" stroke-width="2" />
+                </svg>
+                <p class="text-[10px] text-center font-bold">Increasing Velocity</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Velocity-Time Graphs -->
+    <div class="note-card">
+        <h3 class="text-xl font-bold mb-4 text-purple-700">Velocity-Time Graphs</h3>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><span class="kw-bold text-red-600">Slope</span> equals <span class="kw-bold">acceleration</span>.</li>
+            <li><span class="kw-bold text-green-600">Area</span> under the curve equals <span class="kw-bold">displacement</span>.</li>
+            <li>Straight line = uniform acceleration.</li>
+            <li>Horizontal line = constant velocity (zero acceleration).</li>
+        </ul>
+        
+        <!-- SVG Graphs Row 2 -->
+        <div class="flex flex-wrap justify-around mt-4">
+            <div class="w-1/3 p-1">
+                <svg viewBox="0 0 100 100" class="w-full bg-white border border-gray-300">
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="1" />
+                    <line x1="10" y1="90" x2="10" y2="10" stroke="black" stroke-width="1" />
+                    <line x1="10" y1="50" x2="90" y2="50" stroke="red" stroke-width="2" />
+                </svg>
+                <p class="text-[10px] text-center font-bold">Const Velocity (a=0)</p>
+            </div>
+            <div class="w-1/3 p-1">
+                <svg viewBox="0 0 100 100" class="w-full bg-white border border-gray-300">
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="1" />
+                    <line x1="10" y1="90" x2="10" y2="10" stroke="black" stroke-width="1" />
+                    <line x1="10" y1="90" x2="90" y2="10" stroke="red" stroke-width="2" />
+                </svg>
+                <p class="text-[10px] text-center font-bold">Const Acceleration</p>
+            </div>
+            <div class="w-1/3 p-1">
+                <svg viewBox="0 0 100 100" class="w-full bg-white border border-gray-300">
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="1" />
+                    <line x1="10" y1="90" x2="10" y2="10" stroke="black" stroke-width="1" />
+                    <path d="M 10 90 Q 50 80 90 10" fill="none" stroke="red" stroke-width="2" />
+                </svg>
+                <p class="text-[10px] text-center font-bold">Increasing Accel.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Area under V-T Graph Example -->
+    <div class="note-card bg-yellow-50">
+        <h3 class="text-lg font-bold mb-2">Worked Example: Area under Graph</h3>
+        <p class="text-sm">To find displacement: Split area into shapes (triangles/rectangles).</p>
+        <p class="text-sm mt-2 font-mono">Area of triangle = <span class="fraction"><span class="numerator">1</span><span class="denominator">2</span></span> x base x height</p>
+        <p class="text-sm font-mono">Area of rectangle = base x height</p>
+    </div>
+
+    <!-- Quiz Section 2 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-2xl font-bold text-center mb-6 text-blue-600">Quiz: Motion Graphs</h3>
+        <div id="quiz-container-2"></div>
+    </div>
+</div>
+
+<!-- SECTION 3: Deriving Equations -->
+<div id="sec3" class="topic-section ipad-container pb-20">
+    <button onclick="showMindMap()" class="mb-4 text-blue-600 font-bold">← Back to Map</button>
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">Deriving Kinematic Equations</h2>
+
+    <div class="bg-blue-100 p-4 rounded-lg mb-4 text-center">
+        <p class="font-bold text-blue-900">Variables (SUVAT):</p>
+        <p class="text-sm">s = displacement, u = initial velocity, v = final velocity, a = acceleration, t = time</p>
+    </div>
+
+    <!-- Equation 1 -->
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2 text-indigo-700">1. Deriving <span class="math-eq">v = u + at</span></h3>
+        <p class="text-sm">From the gradient of a velocity-time graph:</p>
+        <div class="math-eq text-center my-2">
+            a = <div class="fraction"><span class="numerator">v - u</span><span class="denominator">t</span></div>
+        </div>
+        <p class="text-sm">Rearrange: <span class="math-eq">at = v - u</span> &rarr; <span class="math-eq kw-bold bg-yellow-200 p-1">v = u + at</span></p>
+    </div>
+
+    <!-- Equation 2 -->
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2 text-indigo-700">2. Deriving <span class="math-eq">s = <span class="fraction"><span class="numerator">u + v</span><span class="denominator">2</span></span>t</span></h3>
+        <p class="text-sm">Displacement is the area under v-t graph.</p>
+        <p class="text-sm">Average velocity is halfway between u and v.</p>
+        <div class="math-eq text-center my-2 kw-bold bg-yellow-200 p-1">
+            s = <div class="fraction"><span class="numerator">u + v</span><span class="denominator">2</span></div> t
+        </div>
+    </div>
+
+    <!-- Equation 3 -->
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2 text-indigo-700">3. Deriving <span class="math-eq">s = ut + <span class="fraction"><span class="numerator">1</span><span class="denominator">2</span></span>at<sup class="power">2</sup></span></h3>
+        <p class="text-sm">Area under graph = Rectangle (ut) + Triangle (<span class="fraction"><span class="numerator">1</span><span class="denominator">2</span></span>(v-u)t).</p>
+        <p class="text-sm">Since (v-u) = at:</p>
+        <div class="math-eq text-center my-2 kw-bold bg-yellow-200 p-1">
+            s = ut + <div class="fraction"><span class="numerator">1</span><span class="denominator">2</span></div> at<sup class="power">2</sup>
+        </div>
+    </div>
+
+    <!-- Equation 4 -->
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2 text-indigo-700">4. Deriving <span class="math-eq">v<sup class="power">2</sup> = u<sup class="power">2</sup> + 2as</span></h3>
+        <p class="text-sm">Substitute t = (v-u)/a into equation 2.</p>
+        <div class="math-eq text-center my-2 kw-bold bg-yellow-200 p-1">
+            v<sup class="power">2</sup> = u<sup class="power">2</sup> + 2as
+        </div>
+    </div>
+    
+    <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded text-sm">
+        <span class="font-bold">Important:</span> Only equations 3 and 4 are usually on the data sheet. Memorize all!
+    </div>
+
+    <!-- Quiz Section 3 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-2xl font-bold text-center mb-6 text-blue-600">Quiz: Derivations</h3>
+        <div id="quiz-container-3"></div>
+    </div>
+</div>
+
+<!-- SECTION 4: Solving Problems -->
+<div id="sec4" class="topic-section ipad-container pb-20">
+    <button onclick="showMindMap()" class="mb-4 text-blue-600 font-bold">← Back to Map</button>
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">Solving Problems (SUVAT)</h2>
+    
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2">Step-by-Step Method</h3>
+        <ol class="list-decimal pl-5 space-y-2">
+            <li>Write out variables known and unknown (<span class="font-mono text-blue-600">s, u, v, a, t</span>).</li>
+            <li>Deduce implicit values (e.g., "starts at rest" &rarr; u=0; "gravity" &rarr; a=9.81).</li>
+            <li>Choose the equation that contains the quantities you have.</li>
+            <li>Convert units to SI units.</li>
+            <li>Rearrange and solve.</li>
+        </ol>
+    </div>
+
+    <div class="note-card border-green-500 border-l-4">
+        <h3 class="font-bold text-green-700 mb-2">Worked Example: Train Stopper</h3>
+        <p class="text-sm mb-2">Train speed 50 m s<sup class="power">-1</sup>. Must pass marker 2 at 10 m s<sup class="power">-1</sup>. Time limit 20 s.</p>
+        <p class="text-sm"><span class="font-bold">Knowns:</span> u = 50, v = 10, t = 20, s = ?</p>
+        <p class="text-sm"><span class="font-bold">Equation:</span> s = <span class="fraction"><span class="numerator">u + v</span><span class="denominator">2</span></span> t</p>
+        <p class="text-sm mt-2"><span class="font-bold">Calculation:</span> s = <span class="fraction"><span class="numerator">50 + 10</span><span class="denominator">2</span></span> x 20 = <span class="font-bold text-xl">600 m</span></p>
+    </div>
+
+    <!-- Quiz Section 4 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-2xl font-bold text-center mb-6 text-blue-600">Quiz: Solving Problems</h3>
+        <div id="quiz-container-4"></div>
+    </div>
+</div>
+
+<!-- SECTION 5: Free Fall Experiment -->
+<div id="sec5" class="topic-section ipad-container pb-20">
+    <button onclick="showMindMap()" class="mb-4 text-blue-600 font-bold">← Back to Map</button>
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">Acceleration of Free Fall</h2>
+    
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2">Aim</h3>
+        <p>Calculate 'g' by measuring time for a ball-bearing to fall a distance.</p>
+        <ul class="list-disc pl-5 mt-2 text-sm">
+            <li><span class="font-bold">Independent:</span> Height (h)</li>
+            <li><span class="font-bold">Dependent:</span> Time (t)</li>
+        </ul>
+    </div>
+
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2">Apparatus Setup</h3>
+        <!-- Setup Diagram SVG -->
+        <div class="svg-container bg-gray-50 rounded p-4">
+            <svg viewBox="0 0 200 300" class="w-full max-w-xs mx-auto">
+                <!-- Stand -->
+                <rect x="20" y="20" width="10" height="260" fill="#4a5568"/>
+                <rect x="10" y="280" width="50" height="10" fill="#4a5568"/>
+                <!-- Electromagnet -->
+                <rect x="30" y="30" width="40" height="20" fill="#2d3748"/>
+                <!-- Ball -->
+                <circle cx="50" cy="55" r="5" fill="#718096"/>
+                <!-- Light Gates -->
+                <rect x="60" y="100" width="30" height="10" fill="#e53e3e" opacity="0.8"/>
+                <text x="95" y="108" font-size="10">Gate 1</text>
+                <rect x="60" y="200" width="30" height="10" fill="#e53e3e" opacity="0.8"/>
+                <text x="95" y="208" font-size="10">Gate 2</text>
+                <!-- Cushion -->
+                <rect x="30" y="270" width="40" height="10" fill="#ecc94b"/>
+            </svg>
+        </div>
+        
+        <h4 class="font-bold mt-4 text-blue-600">Analysis</h4>
+        <p class="text-sm">Use equation: s = ut + <span class="fraction"><span class="numerator">1</span><span class="denominator">2</span></span>at<sup class="power">2</sup></p>
+        <p class="text-sm">Rearranged for straight line graph: <span class="math-eq kw-bold">2h/t = gt + 2u</span></p>
+        <ul class="list-disc pl-5 mt-2 text-sm">
+            <li>Plot <span class="font-bold">2h/t</span> (y-axis) vs <span class="font-bold">t</span> (x-axis).</li>
+            <li>Gradient = <span class="font-bold text-red-600">g</span>.</li>
+            <li>Y-intercept = 2u.</li>
+        </ul>
+    </div>
+
+    <!-- Quiz Section 5 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-2xl font-bold text-center mb-6 text-blue-600">Quiz: Experiments</h3>
+        <div id="quiz-container-5"></div>
+    </div>
+</div>
+
+<!-- SECTION 6: Projectile Motion -->
+<div id="sec6" class="topic-section ipad-container pb-20">
+    <button onclick="showMindMap()" class="mb-4 text-blue-600 font-bold">← Back to Map</button>
+    <h2 class="text-3xl font-bold text-blue-800 mb-6">Projectile Motion</h2>
+
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2 text-indigo-700">Key Concepts</h3>
+        <p class="mb-2">Vertical and horizontal components are <span class="kw-bold kw-underline">independent</span>.</p>
+        
+        <!-- Projectile SVG -->
+        <div class="svg-container bg-white border rounded p-4">
+            <svg viewBox="0 0 300 150" class="w-full">
+                <!-- Axes -->
+                <line x1="20" y1="130" x2="280" y2="130" stroke="black" />
+                <line x1="20" y1="130" x2="20" y2="20" stroke="black" />
+                <!-- Path -->
+                <path d="M 20 130 Q 150 -50 280 130" fill="none" stroke="#3182ce" stroke-width="2" stroke-dasharray="5 5"/>
+                <!-- Initial Vectors -->
+                <line x1="20" y1="130" x2="60" y2="90" stroke="#e53e3e" stroke-width="2" marker-end="url(#arrowred)"/>
+                <text x="65" y="85" font-size="12" fill="#e53e3e">u</text>
+                <!-- Components -->
+                <text x="80" y="145" font-size="10">Range (R)</text>
+                <text x="140" y="30" font-size="10">Max Height (H)</text>
+            </svg>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div class="bg-blue-50 p-2 rounded">
+                <p class="font-bold text-center text-sm">Horizontal (&rarr;)</p>
+                <p class="text-xs text-center">a = 0</p>
+                <p class="text-xs text-center">u<sub>x</sub> = u cos &theta;</p>
+                <p class="text-xs text-center">Range R = (u cos &theta;)t</p>
+            </div>
+            <div class="bg-red-50 p-2 rounded">
+                <p class="font-bold text-center text-sm">Vertical (&uarr;)</p>
+                <p class="text-xs text-center">a = -g</p>
+                <p class="text-xs text-center">u<sub>y</sub> = u sin &theta;</p>
+                <p class="text-xs text-center">Use SUVAT</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equations Summary -->
+    <div class="note-card">
+        <h3 class="font-bold text-lg mb-2">Equations</h3>
+        <p class="text-sm"><span class="font-bold">Time of Flight:</span> t = <span class="fraction"><span class="numerator">2u sin &theta;</span><span class="denominator">g</span></span></p>
+        <p class="text-sm mt-2"><span class="font-bold">Max Height:</span> H = <span class="fraction"><span class="numerator">(u sin &theta;)<sup class="power">2</sup></span><span class="denominator">2g</span></span></p>
+        <p class="text-sm mt-2"><span class="font-bold">Range:</span> R = <span class="fraction"><span class="numerator">u<sup class="power">2</sup> sin 2&theta;</span><span class="denominator">g</span></span></p>
+    </div>
+
+    <!-- Worked Example -->
+    <div class="note-card border-l-4 border-orange-500">
+        <h3 class="font-bold text-orange-700 mb-2">Worked Example: Motorcycle Jump</h3>
+        <p class="text-sm">Takes off horizontally 1.25m high. Lands 10m away. What was speed?</p>
+        <p class="text-sm mt-2 font-bold text-blue-600">Step 1: Vertical (Find Time)</p>
+        <p class="text-sm font-mono">s = 1.25, u = 0, a = 9.81</p>
+        <p class="text-sm font-mono">s = 0.5gt<sup class="power">2</sup> &rarr; t = <span class="sqrt">2s/g</span> = 0.5 s</p>
+        <p class="text-sm mt-2 font-bold text-blue-600">Step 2: Horizontal (Find Speed)</p>
+        <p class="text-sm font-mono">s = 10, t = 0.5, a = 0</p>
+        <p class="text-sm font-mono">u = s/t = 10/0.5 = <span class="font-bold text-xl">20 m s<sup class="power">-1</sup></span></p>
+    </div>
+
+    <!-- Quiz Section 6 -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mt-8">
+        <h3 class="text-2xl font-bold text-center mb-6 text-blue-600">Quiz: Projectiles</h3>
+        <div id="quiz-container-6"></div>
+    </div>
+</div>
+
+<script>
+    // Navigation Logic
+    function showSection(id) {
+        document.getElementById('mindmap').style.display = 'none';
+        document.querySelectorAll('.topic-section').forEach(el => el.classList.remove('active'));
+        const section = document.getElementById(id);
+        section.style.display = 'block';
+        setTimeout(() => section.classList.add('active'), 10);
+        window.scrollTo(0, 0);
+    }
+
+    function showMindMap() {
+        document.querySelectorAll('.topic-section').forEach(el => {
+            el.classList.remove('active');
+            el.style.display = 'none';
+        });
+        document.getElementById('mindmap').style.display = 'flex';
+    }
+
+    // Quiz Data
+    const quizzes = {
+        'sec1': [
+            { q: "Is distance a scalar or vector?", options: ["Scalar", "Vector", "Both", "Neither"], a: 0 },
+            { q: "What is the SI unit for speed?", options: ["km/h", "mph", "m s⁻¹", "cm s⁻¹"], a: 2 },
+            { q: "Displacement is...", options: ["Total ground covered", "Change in position", "Always positive", "Speed x Time"], a: 1 },
+            { q: "Velocity is defined as...", options: ["Rate of change of speed", "Rate of change of displacement", "Distance / Time", "Rate of change of acceleration"], a: 1 },
+            { q: "If you run 400m around a track and return to start, what is displacement?", options: ["400m", "0m", "200m", "100m"], a: 1 },
+            { q: "Acceleration is the rate of change of...", options: ["Velocity", "Speed", "Distance", "Position"], a: 0 },
+            { q: "What is the formula for average velocity?", options: ["(u+v)/2", "(u-v)/t", "ut + ½at²", "v - u"], a: 0 },
+            { q: "A negative acceleration is often called...", options: ["Increasing speed", "Deceleration", "Terminal velocity", "Static motion"], a: 1 },
+            { q: "Is 48km a distance or displacement in the professor example?", options: ["Distance", "Displacement", "Velocity", "Acceleration"], a: 0 },
+            { q: "Change in velocity is calculated as...", options: ["v - u", "u - v", "v + u", "v x u"], a: 0 }
+        ],
+        'sec2': [
+            { q: "Slope of a distance-time graph represents...", options: ["Velocity", "Acceleration", "Speed", "Displacement"], a: 2 },
+            { q: "Horizontal line on a distance-time graph means...", options: ["Constant speed", "At rest", "Accelerating", "Returning home"], a: 1 },
+            { q: "Slope of a displacement-time graph represents...", options: ["Speed", "Velocity", "Acceleration", "Time"], a: 1 },
+            { q: "Curved line on a displacement-time graph means...", options: ["Constant Velocity", "Rest", "Acceleration", "Linear motion"], a: 2 },
+            { q: "Slope of a velocity-time graph represents...", options: ["Displacement", "Speed", "Acceleration", "Distance"], a: 2 },
+            { q: "Area under a velocity-time graph represents...", options: ["Acceleration", "Speed", "Displacement", "Time"], a: 2 },
+            { q: "Horizontal line on a velocity-time graph means...", options: ["Rest", "Constant Velocity", "Constant Acceleration", "Deceleration"], a: 1 },
+            { q: "Area of a triangle formula?", options: ["bh", "½bh", "2bh", "b+h"], a: 1 },
+            { q: "Negative slope on velocity-time graph means...", options: ["Speeding up", "Slowing down (Decelerating)", "Moving backwards", "Constant speed"], a: 1 },
+            { q: "A straight diagonal line on an acceleration-time graph means...", options: ["Constant Acceleration", "Increasing Acceleration", "Zero Acceleration", "Constant Velocity"], a: 1 }
+        ],
+        'sec3': [
+            { q: "Which equation links u, v, a, t?", options: ["s = ut", "v = u + at", "v² = u² + 2as", "s = ½(u+v)t"], a: 1 },
+            { q: "Which variable is NOT in v = u + at?", options: ["s", "u", "v", "a"], a: 0 },
+            { q: "Which equation is derived from the area of a trapezium?", options: ["v = u + at", "s = ½(u+v)t", "v² = u² + 2as", "s = ut + ½at²"], a: 1 },
+            { q: "In s = ut + ½at², what does 'ut' represent on the graph?", options: ["Area of triangle", "Area of rectangle", "Total area", "Gradient"], a: 1 },
+            { q: "Which equation is derived by substituting t into the others?", options: ["v = u + at", "s = vt", "v² = u² + 2as", "s = ½(u+v)t"], a: 2 },
+            { q: "What does 'u' stand for?", options: ["Final velocity", "Initial velocity", "Acceleration", "Time"], a: 1 },
+            { q: "If an object starts from rest, u = ?", options: ["0", "9.81", "v", "Undefined"], a: 0 },
+            { q: "Which equation does NOT require time (t)?", options: ["v = u + at", "s = ut + ½at²", "v² = u² + 2as", "s = ½(u+v)t"], a: 2 },
+            { q: "The derivation of v = u + at comes from...", options: ["Area under graph", "Gradient of v-t graph", "Gradient of d-t graph", "Pythagoras"], a: 1 },
+            { q: "Are all 4 kinematic equations given in the exam?", options: ["Yes", "No, usually only two", "None", "Only v=u+at"], a: 1 }
+        ],
+        'sec4': [
+            { q: "First step in solving kinematic problems?", options: ["Guess the answer", "List variables (SUVAT)", "Draw a picture", "Memorize formula"], a: 1 },
+            { q: "What is the value of 'a' for free fall?", options: ["0", "100", "9.81", "1"], a: 2 },
+            { q: "If a car stops, what is v?", options: ["50", "Unknown", "0", "Initial speed"], a: 2 },
+            { q: "In the train example, what was the time limit?", options: ["10s", "20s", "50s", "5s"], a: 1 },
+            { q: "Which unit must be converted to seconds?", options: ["Hours", "Metres", "Kilograms", "Newtons"], a: 0 },
+            { q: "Can SUVAT equations be used for changing acceleration?", options: ["Yes", "No, only constant acceleration", "Sometimes", "Always"], a: 1 },
+            { q: "What is displacement (s) measured in?", options: ["m/s", "m/s²", "Metres (m)", "Seconds"], a: 2 },
+            { q: "If speed is constant, what is 'a'?", options: ["9.81", "0", "Infinite", "1"], a: 1 },
+            { q: "Deceleration is usually represented as...", options: ["Positive a", "Negative a", "Zero a", "Imaginary a"], a: 1 },
+            { q: "In v² = u² + 2as, if u > v, then...", options: ["a is positive", "a is negative", "s is zero", "t is negative"], a: 1 }
+        ],
+        'sec5': [
+            { q: "What is the independent variable in the free fall experiment?", options: ["Time", "Height (h)", "Gravity", "Ball mass"], a: 1 },
+            { q: "What is the dependent variable?", options: ["Time (t)", "Height", "Length of tube", "Current"], a: 0 },
+            { q: "What equipment holds the ball initially?", options: ["Hand", "Electromagnet", "Clamp", "Glue"], a: 1 },
+            { q: "Why use a steel ball?", options: ["It's heavy", "It's magnetic", "It's shiny", "It's cheap"], a: 1 },
+            { q: "What stops the timer?", options: ["First light gate", "Second light gate", "Sound", "Impact"], a: 1 },
+            { q: "What equation is used for the graph?", options: ["y = mx + c", "v = u + at", "2h/t = gt + 2u", "E = mc²"], a: 2 },
+            { q: "The gradient of the 2h/t vs t graph represents...", options: ["Height", "Time", "Gravity (g)", "Velocity"], a: 2 },
+            { q: "What is a major systematic error?", options: ["Parallax", "Residual magnetism", "Wind", "Friction"], a: 1 },
+            { q: "How do you reduce random errors?", options: ["Do it once", "Repeat and average", "Use better glue", "Change the ball"], a: 1 },
+            { q: "Safety precaution?", options: ["Wear gloves", "Don't switch current until set up", "Run fast", "Use glass ball"], a: 1 }
+        ],
+        'sec6': [
+            { q: "Horizontal and vertical motions are...", options: ["Connected", "Independent", "Opposite", "Identical"], a: 1 },
+            { q: "Horizontal acceleration of a projectile is...", options: ["9.81", "0", "-9.81", "Variable"], a: 1 },
+            { q: "Vertical acceleration is...", options: ["0", "9.81", "-g (gravity)", "Positive"], a: 2 },
+            { q: "Equation for horizontal range?", options: ["Distance = Speed x Time", "v = u + at", "s = ut + ½at²", "Pythagoras"], a: 0 },
+            { q: "At max height, vertical velocity is...", options: ["Max", "Min", "0", "9.81"], a: 2 },
+            { q: "To find time of flight, which component do you use?", options: ["Horizontal", "Vertical", "Both", "Neither"], a: 1 },
+            { q: "Angle for max range?", options: ["30", "45", "60", "90"], a: 1 },
+            { q: "Horizontal velocity component?", options: ["u sin θ", "u cos θ", "u tan θ", "u"], a: 1 },
+            { q: "Vertical velocity component?", options: ["u sin θ", "u cos θ", "u tan θ", "u"], a: 0 },
+            { q: "In the stunt example, calculating time used...", options: ["Horizontal distance", "Vertical height", "Bike speed", "Wheel size"], a: 1 }
+        ]
+    };
+
+    // Render Quizzes
+    Object.keys(quizzes).forEach(key => {
+        const container = document.getElementById(`quiz-container-${key.replace('sec', '')}`);
+        const questions = quizzes[key];
+        
+        // Start Button
+        const startBtn = document.createElement('button');
+        startBtn.className = "w-full bg-blue-500 text-white p-3 rounded font-bold hover:bg-blue-600 transition";
+        startBtn.innerText = "Start 10 Question Quiz";
+        startBtn.onclick = () => {
+            renderQuestion(container, questions, 0, 0);
+        };
+        container.appendChild(startBtn);
+    });
+
+    function renderQuestion(container, questions, index, score) {
+        if (index >= questions.length) {
+            container.innerHTML = `
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold mb-2">Quiz Complete!</h3>
+                    <p class="text-xl">Score: ${score} / ${questions.length}</p>
+                    <button onclick="location.reload()" class="mt-4 bg-gray-500 text-white p-2 rounded">Restart Section</button>
+                </div>
+            `;
+            return;
+        }
+
+        const q = questions[index];
+        // Note: Removed duplicate ID 'options-box', changed to class 'options-container'
+        container.innerHTML = `
+            <div class="mb-4">
+                <div class="flex justify-between text-sm text-gray-500 mb-2">
+                    <span>Question ${index + 1}/10</span>
+                    <span>Score: ${score}</span>
+                </div>
+                <h4 class="text-lg font-bold mb-4">${q.q}</h4>
+                <div class="space-y-2 options-container">
+                    ${q.options.map((opt, i) => `
+                        <button onclick="checkAnswer(this, ${i}, ${q.a}, ${index}, ${score})" class="quiz-btn">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    function checkAnswer(btn, selected, correct, index, score) {
+        // Disable all buttons in this specific question container
+        const optionsContainer = btn.parentElement; 
+        Array.from(optionsContainer.children).forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            // Highlight correct one
+            optionsContainer.children[correct].classList.add('correct');
+        }
+
+        setTimeout(() => {
+            // Find the main quiz container (e.g., id="quiz-container-1")
+            const container = btn.closest('[id^="quiz-container-"]');
+            
+            // Get questions array again
+            const sectionId = container.id.split('-')[2];
+            const questions = quizzes['sec' + sectionId];
+            renderQuestion(container, questions, index + 1, score);
+        }, 1500);
+    }
+</script>
+
+</body>
+</html>
