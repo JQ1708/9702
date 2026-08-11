@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C8 Superposition — See the Invisible | AS Physics 9702</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#151b23; --panel2:#1c242e; --line:#2a3440;
+  --ink:#e8eef5; --muted:#93a3b4; --dim:#6b7b8c;
+  --cyan:#4cc9f0; --violet:#b388ff; --pink:#ff6b9d; --lime:#8ce99a;
+  --amber:#ffd43b; --red:#ff8787;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#f6f8fb; --panel:#ffffff; --panel2:#eef2f7; --line:#d8e0ea;
+    --ink:#101720; --muted:#5a6b7c; --dim:#8494a4;
+    --cyan:#0e7490; --violet:#6d28d9; --pink:#be185d; --lime:#15803d;
+    --amber:#b45309; --red:#b91c1c; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Segoe UI",Roboto,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px 100px}
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .inner{max-width:1000px;margin:0 auto;padding:10px 18px;display:flex;gap:6px;
+  align-items:center;overflow-x:auto;scrollbar-width:none}
+nav .inner::-webkit-scrollbar{display:none}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:5px 10px;
+  border-radius:7px;white-space:nowrap;transition:.15s}
+nav a:hover{color:var(--ink);background:var(--panel2)}
+nav a.home{color:var(--violet);font-weight:700}
+header{padding:56px 0 34px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  color:var(--violet);border:1px solid var(--violet);padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(30px,6vw,50px);line-height:1.1;margin:0 0 14px;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--violet)}
+.lede{color:var(--muted);font-size:17px;max-width:42em;margin:0}
+section{margin:0 0 66px;scroll-margin-top:70px}
+h2{font-size:clamp(22px,4vw,30px);margin:0 0 6px;letter-spacing:-.01em;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 .num{font-family:var(--mono);font-size:14px;color:var(--violet);opacity:.8}
+h3{font-size:17px;margin:30px 0 10px}
+.sub{color:var(--muted);margin:0 0 22px;max-width:44em}
+p{max-width:44em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:18px 0}
+.def{background:var(--panel);border-left:3px solid var(--violet);border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0}
+.def .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--violet);text-transform:uppercase;margin-bottom:4px}
+.trap{background:color-mix(in srgb,var(--red) 10%,var(--panel));border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0}
+.trap .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.exam{background:color-mix(in srgb,var(--amber) 10%,var(--panel));border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0}
+.exam .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin-bottom:4px}
+.def p,.trap p,.exam p{margin:6px 0}
+.def p:last-child,.trap p:last-child,.exam p:last-child{margin-bottom:0}
+.sim{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:22px 0}
+.sim-head{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sim-head .name{font-weight:650;font-size:14px}
+.sim-head .hint{font-size:12px;color:var(--dim)}
+.sim canvas{display:block;width:100%;background:transparent;touch-action:none;cursor:crosshair}
+.ctrls{padding:14px 18px;border-top:1px solid var(--line);background:var(--panel2);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px 22px}
+.ctrl label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)}
+.ctrl label span{color:var(--violet)}
+input[type=range]{width:100%;accent-color:var(--violet);height:20px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line);background:var(--panel2)}
+button{font:inherit;font-size:13px;padding:6px 14px;border-radius:8px;cursor:pointer;
+  background:var(--panel);color:var(--ink);border:1px solid var(--line);transition:.15s}
+button:hover{border-color:var(--violet);color:var(--violet)}
+button.on{background:var(--violet);border-color:var(--violet);color:#0b0416;font-weight:650}
+.readout{padding:12px 18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:13px;
+  display:flex;gap:20px;flex-wrap:wrap;background:var(--panel2)}
+.readout b{color:var(--violet);font-weight:650}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tbody tr:hover{background:var(--panel2)}
+.eq{font-family:var(--mono);color:var(--cyan);white-space:nowrap}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--muted);margin:2px 4px 2px 0}
+.pill.hot{border-color:var(--red);color:var(--red)}
+.pill.warm{border-color:var(--amber);color:var(--amber)}
+ul,ol{max-width:44em;padding-left:22px}
+li{margin:5px 0}
+.foot{border-top:1px solid var(--line);padding-top:22px;color:var(--dim);font-size:13px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:12px 0}
+summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--violet)}
+details[open] summary{margin-bottom:8px}
+@media print{
+  body{background:#fff;color:#000}
+  nav,.ctrls,.btnrow,button{display:none!important}
+  .sim,.card,.def,.trap,.exam{break-inside:avoid;border-color:#bbb}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="inner">
+  <a class="home" href="index.html">← Hub</a>
+  <a href="#principle">1 Superposition</a>
+  <a href="#stationary">2 Stationary</a>
+  <a href="#harmonics">3 Harmonics</a>
+  <a href="#diffraction">4 Diffraction</a>
+  <a href="#twosource">5 Two sources</a>
+  <a href="#young">6 Young</a>
+  <a href="#grating">7 Grating</a>
+  <a href="#radar">Exam Radar</a>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <div class="tag">CAIE 9702 · Chapter 8</div>
+  <h1>Superposition — <em>waves adding up</em></h1>
+  <p class="lede">Everything in this chapter is one idea repeated: <b>when two waves meet, add their
+  displacements</b>. Stationary waves, harmonics, interference, double slits, gratings — all of them
+  are that single sentence applied to a different geometry. Play with each one until you see the
+  adding happen.</p>
+</header>
+
+<!-- 1 PRINCIPLE -->
+<section id="principle">
+  <h2><span class="num">01</span> The principle of superposition</h2>
+  <p class="sub">Two waves pass through the same point. At that instant, the resultant displacement
+  is just the <b>sum</b> — with signs. That's it. Both waves then carry on completely unchanged.</p>
+
+  <div class="sim" data-sim="add">
+    <div class="sim-head"><span class="name">Add two waves, point by point</span>
+      <span class="hint">green = the sum</span></div>
+    <canvas height="400"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Amplitude of wave 2 <span data-out="a2">1.0</span></label>
+        <input type="range" data-p="a2" min="0" max="1.6" step="0.05" value="1"></div>
+      <div class="ctrl"><label>Phase difference <span data-out="ph">0°</span></label>
+        <input type="range" data-p="ph" min="0" max="360" step="1" value="0"></div>
+    </div>
+    <div class="btnrow">
+      <button data-act="p0">In phase (0°)</button>
+      <button data-act="p180">Antiphase (180°)</button>
+      <button data-act="p90">90°</button>
+      <button data-act="anim" class="on">⏸ Freeze</button>
+    </div>
+    <div class="readout">
+      <span>resultant amplitude ≈ <b data-out="res">2.00</b></span>
+      <span data-out="kind" style="color:var(--lime)">constructive — maximum</span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Definition</div>
+    <p><b>Principle of superposition</b> — when two or more waves meet at a point, the resultant
+    displacement is the <b>sum of the individual displacements</b> of the waves at that point.</p>
+    <p>Note the word <b>displacement</b>, not "amplitude" and not "intensity". Amplitudes only add
+    when the waves happen to be in phase.</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap</div>
+    <p>Constructive interference needs waves <b>in phase</b> (phase difference 0, 360°, 720°…).
+    Destructive needs them <b>antiphase</b> (180°, 540°…). If the two amplitudes are equal,
+    destructive gives <b>exactly zero</b>; if unequal, it gives a non-zero minimum — which is why
+    "the dark fringes are not completely dark" when one slit is partly covered.</p>
+  </div>
+</section>
+
+<!-- 2 STATIONARY -->
+<section id="stationary">
+  <h2><span class="num">02</span> Stationary waves — the wave that goes nowhere</h2>
+  <p class="sub">Send a wave down a string, let it reflect off the fixed end, and the incident and
+  reflected waves superpose. At some points they always cancel (<b>nodes</b>); at others they always
+  reinforce (<b>antinodes</b>). Nothing travels — the pattern just stands there and breathes.</p>
+
+  <div class="sim" data-sim="stat">
+    <div class="sim-head"><span class="name">Incident + reflected = stationary</span>
+      <span class="hint">watch the two thin waves make the thick one</span></div>
+    <canvas height="440"></canvas>
+    <div class="btnrow">
+      <button data-act="anim" class="on">⏸ Pause</button>
+      <button data-act="comp" class="on">Show the two component waves</button>
+      <button data-act="env">Show envelope</button>
+      <button data-act="lab" class="on">N / A labels</button>
+      <button data-act="step">Step T/4</button>
+    </div>
+    <div class="ctrls">
+      <div class="ctrl"><label>Harmonic (loops) <span data-out="n">3</span></label>
+        <input type="range" data-p="n" min="1" max="6" step="1" value="3"></div>
+    </div>
+    <div class="readout">
+      <span>node → node spacing = <b>λ / 2</b></span>
+      <span>node → antinode = <b>λ / 4</b></span>
+      <span data-out="lam">λ = 2L/3</span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Formation — the three conditions (write all three)</div>
+    <p>A stationary wave forms when two progressive waves</p>
+    <p>1. travel in <b>opposite directions</b> along the same line and overlap,<br>
+       2. have the <b>same frequency</b> (and hence same wavelength and speed),<br>
+       3. have <b>equal (or similar) amplitude</b>.</p>
+    <p>In practice: the wave sent along the medium and its <b>reflection</b> from a fixed boundary.</p>
+    <p><b>Node</b> — a point of <b>zero</b> amplitude (destructive superposition at all times).<br>
+       <b>Antinode</b> — a point of <b>maximum</b> amplitude (constructive superposition).</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Stationary vs progressive — the comparison table they ask for</h3>
+    <table>
+      <thead><tr><th></th><th>Stationary wave</th><th>Progressive wave</th></tr></thead>
+      <tbody>
+        <tr><td><b>Energy</b></td><td>does <b>not</b> transfer energy along the wave</td><td>transfers energy in the direction of travel</td></tr>
+        <tr><td><b>Amplitude</b></td><td><b>varies with position</b>: zero at a node, maximum at an antinode</td><td>all points have the <b>same</b> amplitude (assuming no energy is lost — C7's I ∝ 1/r² is the case where it <i>is</i>)</td></tr>
+        <tr><td><b>Phase</b></td><td>all points between two adjacent nodes are <b>in phase</b>; points either side of a node are 180° out of phase</td><td>adjacent points are <b>out of phase</b> — phase changes continuously along the wave</td></tr>
+        <tr><td><b>Waveform</b></td><td>the pattern stays in place</td><td>the waveform moves along</td></tr>
+        <tr><td><b>Frequency</b></td><td>same as the progressive waves that form it</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="trap">
+    <div class="t">Traps</div>
+    <p>Between adjacent nodes every particle is <b>in phase</b> — they all reach maximum displacement
+    at the same instant. They just don't all have the <b>same amplitude</b>. Phase and amplitude are
+    different things; the exam separates them deliberately.</p>
+    <p>Distance between adjacent nodes is <b>λ/2</b>, not λ. Getting this wrong halves or doubles
+    every answer downstream.</p>
+    <p>A stationary wave <b>does not</b> transfer energy — but energy is still stored in it, and each
+    particle still has kinetic and potential energy. "No energy" is wrong; "no energy <i>transfer</i>
+    along the wave" is right.</p>
+  </div>
+</section>
+
+<!-- 3 HARMONICS -->
+<section id="harmonics">
+  <h2><span class="num">03</span> Harmonics on strings and in pipes</h2>
+  <p class="sub">The boundary decides everything. A fixed end must be a <b>node</b>. A free/open end
+  must be an <b>antinode</b>. Fit whole numbers of quarter-wavelengths between them and you have
+  every possible harmonic.</p>
+
+  <div class="sim" data-sim="harm">
+    <div class="sim-head"><span class="name">Harmonics explorer</span>
+      <span class="hint">switch the system, then the harmonic</span></div>
+    <canvas height="330"></canvas>
+    <div class="btnrow">
+      <button data-act="string" class="on">Stretched string</button>
+      <button data-act="open">Open pipe</button>
+      <button data-act="closed">Closed pipe</button>
+      <button data-act="anim" class="on">⏸ Pause</button>
+    </div>
+    <div class="ctrls">
+      <div class="ctrl"><label>Harmonic number <span data-out="n">1</span></label>
+        <input type="range" data-p="n" min="1" max="5" step="1" value="1"></div>
+      <div class="ctrl"><label>Length L <span data-out="L">1.00 m</span></label>
+        <input type="range" data-p="L" min="0.2" max="2" step="0.05" value="1"></div>
+      <div class="ctrl"><label>Wave speed c <span data-out="c">340 m s⁻¹</span></label>
+        <input type="range" data-p="c" min="20" max="500" step="10" value="340"></div>
+    </div>
+    <div class="readout">
+      <span data-out="rel">L = λ/2</span>
+      <span>λ = <b data-out="lam">2.00 m</b></span>
+      <span>f = c/λ = <b data-out="f">170 Hz</b></span>
+      <span data-out="ord" style="color:var(--muted)">fundamental (1st harmonic)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">The three systems, side by side</h3>
+    <table>
+      <thead><tr><th>System</th><th>Ends</th><th>Fundamental</th><th>Allowed harmonics</th><th>f<sub>n</sub></th></tr></thead>
+      <tbody>
+        <tr><td><b>Stretched string</b></td><td>node – node</td><td class="eq">L = λ/2</td><td>all: 1, 2, 3, 4…</td><td class="eq">f<sub>n</sub> = nc / 2L</td></tr>
+        <tr><td><b>Open pipe</b> (both ends open)</td><td>antinode – antinode</td><td class="eq">L = λ/2</td><td>all: 1, 2, 3, 4…</td><td class="eq">f<sub>n</sub> = nc / 2L</td></tr>
+        <tr><td><b>Closed pipe</b> (one end closed)</td><td>node – antinode</td><td class="eq">L = λ/4</td><td><b>odd only</b>: 1, 3, 5…</td><td class="eq">f<sub>n</sub> = (2n−1)c / 4L</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);margin-bottom:0">Closed pipe, harmonic by harmonic:
+    <span class="eq">L = λ/4</span>, <span class="eq">L = 3λ/4</span>, <span class="eq">L = 5λ/4</span>…
+    So a closed pipe of the same length sounds an <b>octave lower</b> than an open one, and it is
+    <b>missing</b> the even harmonics.</p>
+  </div>
+
+  <div class="def">
+    <div class="t">Resonance</div>
+    <p><b>Resonance</b> — a large-amplitude stationary wave is produced when the driving frequency
+    equals a <b>natural frequency</b> of the system.</p>
+    <p><b>Fundamental frequency (first harmonic)</b> — the <b>lowest</b> frequency at which a
+    stationary wave forms in the system.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">The resonance-tube experiment (measuring the speed of sound)</div>
+    <p>A tube is raised out of water under a vibrating tuning fork of known f. You hear resonance at
+    length L₁, then again at L₂.</p>
+    <p><b>First resonance:</b> λ/4 = L₁ + e &nbsp;&nbsp; <b>Second resonance:</b> 3λ/4 = L₂ + e<br>
+    Subtract to kill the end correction: <span class="eq">λ/2 = L₂ − L₁</span> → <b>v = f × 2(L₂ − L₁)</b>.</p>
+    <p><b>Why subtract?</b> The antinode sits slightly <i>above</i> the open end by an unknown
+    end correction e. Subtracting eliminates e — that's the whole point of taking two readings.
+    That sentence is a mark.</p>
+    <p>Fine powder in a horizontal tube (Kundt's tube) piles up at the <b>nodes</b>, because the air
+    there is not moving. Distance between heaps = λ/2.</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap — the piston question</div>
+    <p>"A piston is moved along a tube; resonance is heard at piston positions 20 cm apart. Find λ."<br>
+    The 20 cm is the distance between <b>adjacent nodes</b> ⇒ λ = <b>40 cm</b>, not 20 cm.</p>
+    <p>"State the lowest frequency at which resonance occurs" — go back to the <b>fundamental</b> for
+    that system, don't just use the frequency you were given.</p>
+  </div>
+</section>
+
+<!-- 4 DIFFRACTION -->
+<section id="diffraction">
+  <h2><span class="num">04</span> Diffraction — waves bending round corners</h2>
+  <p class="sub">Squeeze a wave through a gap. If the gap is much wider than λ, the wave carries
+  straight on with only a little fringing at the edges. If the gap is <b>about the same size as λ</b>,
+  the wave spreads out into a semicircle. Narrow the gap and watch.</p>
+
+  <div class="sim" data-sim="diff">
+    <div class="sim-head"><span class="name">Gap width vs wavelength</span>
+      <span class="hint">plan view, like a ripple tank</span></div>
+    <canvas height="380"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Gap width a <span data-out="a">3.0 λ</span></label>
+        <input type="range" data-p="a" min="0.3" max="8" step="0.1" value="3"></div>
+      <div class="ctrl"><label>Wavelength λ <span data-out="lam">24 px</span></label>
+        <input type="range" data-p="lam" min="12" max="46" step="1" value="24"></div>
+    </div>
+    <div class="readout">
+      <span>a / λ = <b data-out="ratio">3.0</b></span>
+      <span data-out="verdict">gap ≫ λ → little spreading</span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Definition</div>
+    <p><b>Diffraction</b> — the <b>spreading</b> of a wave as it passes through a gap or around an
+    obstacle/edge.</p>
+    <p>Diffraction is <b>most noticeable when the gap width is approximately equal to the
+    wavelength</b>.</p>
+    <p>The <b>wavelength, frequency and speed are unchanged</b> by diffraction. Only the shape of
+    the wavefronts changes.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">Drawing the wavefronts — the marking points</div>
+    <ul>
+      <li>Draw at least 3 wavefronts after the gap.</li>
+      <li>They must be <b>curved</b> (semicircular for a narrow gap), centred on the gap.</li>
+      <li><b>Spacing must be unchanged</b> — same distance apart as before the gap (λ doesn't change).</li>
+      <li>For a wide gap: flat in the middle, curling only at the edges.</li>
+    </ul>
+    <p style="color:var(--muted)">Longer wavelength ⇒ <b>more</b> diffraction. That is why you can
+    hear round a corner (λ ≈ 1 m) but cannot see round it (λ ≈ 500 nm).</p>
+  </div>
+</section>
+
+<!-- 5 TWO SOURCE -->
+<section id="twosource">
+  <h2><span class="num">05</span> Two sources — path difference decides everything</h2>
+  <p class="sub">Two coherent sources. Pick any point in the water. Measure how far it is from each
+  source. The <b>difference</b> between those two distances, expressed in wavelengths, tells you
+  instantly whether that point is loud or silent. Drag the point P and watch.</p>
+
+  <div class="sim" data-sim="two">
+    <div class="sim-head"><span class="name">Interference pattern + live path difference</span>
+      <span class="hint">drag anywhere on the canvas</span></div>
+    <canvas height="440"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Source separation <span data-out="d">120 px</span></label>
+        <input type="range" data-p="d" min="50" max="240" step="2" value="120"></div>
+      <div class="ctrl"><label>Wavelength λ <span data-out="lam">34 px</span></label>
+        <input type="range" data-p="lam" min="16" max="60" step="1" value="34"></div>
+    </div>
+    <div class="btnrow">
+      <button data-act="lines">Show maxima / minima lines</button>
+      <button data-act="anim" class="on">⏸ Freeze</button>
+    </div>
+    <div class="readout">
+      <span>S₁P = <b data-out="r1">—</b></span>
+      <span>S₂P = <b data-out="r2">—</b></span>
+      <span>path difference = <b data-out="pd">—</b></span>
+      <span data-out="verdict" style="color:var(--lime)">—</span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Coherence — the most-asked definition in this chapter</div>
+    <p><b>Coherent</b> — having a <b>constant phase difference</b> (which requires the same frequency
+    and hence the same wavelength).</p>
+    <p>Two sources must be coherent for a <b>stable, observable</b> interference pattern.
+    If the phase difference varies randomly the maxima and minima move about too fast to see and the
+    pattern is washed out.</p>
+    <p>They should also have <b>similar amplitudes</b>, so that the minima are close to zero and the
+    pattern has good <b>contrast</b>.</p>
+  </div>
+
+  <div class="card">
+    <b>Path difference rules</b>
+    <table>
+      <thead><tr><th></th><th>Path difference</th><th>Phase difference</th><th>n</th></tr></thead>
+      <tbody>
+        <tr><td><b>Maximum</b> (constructive)</td><td class="eq">nλ</td><td class="eq">n × 360°</td><td>0, 1, 2, 3…</td></tr>
+        <tr><td><b>Minimum</b> (destructive)</td><td class="eq">(n − ½)λ</td><td class="eq">(n − ½) × 360°</td><td>1, 2, 3, 4…</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);margin-bottom:0">Method for every path-difference question:
+    <b>path difference ÷ λ</b>. Whole number → maximum. Something-and-a-half → minimum.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">"Why don't two car headlights make an interference pattern?" [3]</div>
+    <ul>
+      <li>The two sources are <b>not coherent</b> — the phase difference between them changes randomly.</li>
+      <li>They emit a <b>range of wavelengths</b> (white light), not a single frequency.</li>
+      <li>Their separation a is large, so <span class="eq">x = λD/a</span> is far too small to resolve.</li>
+    </ul>
+    <p>This is why the classic experiment uses <b>one</b> source split into two by a double slit —
+    that guarantees coherence.</p>
+  </div>
+</section>
+
+<!-- 6 YOUNG -->
+<section id="young">
+  <h2><span class="num">06</span> Young's double-slit experiment</h2>
+  <p class="sub">Same physics as section 5, now measured. The bright fringes land at regular spacing
+  x on a screen a distance D away. Change λ, a or D and watch the fringes respond — then check
+  against the formula.</p>
+
+  <div class="sim" data-sim="young">
+    <div class="sim-head"><span class="name">Double slit → fringes on the screen</span>
+      <span class="hint">the strip is what the student would actually see</span></div>
+    <canvas height="420"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Wavelength λ <span data-out="lam">550 nm</span></label>
+        <input type="range" data-p="lam" min="400" max="700" step="5" value="550"></div>
+      <div class="ctrl"><label>Slit separation a <span data-out="a">0.50 mm</span></label>
+        <input type="range" data-p="a" min="0.2" max="1.5" step="0.05" value="0.5"></div>
+      <div class="ctrl"><label>Slit–screen distance D <span data-out="D">2.0 m</span></label>
+        <input type="range" data-p="D" min="0.5" max="4" step="0.1" value="2"></div>
+      <div class="ctrl"><label>Second slit brightness <span data-out="b">100 %</span></label>
+        <input type="range" data-p="b" min="0" max="1" step="0.02" value="1"></div>
+    </div>
+    <div class="readout">
+      <span>x = λD/a = <b data-out="x">2.20 mm</b></span>
+      <span data-out="note" style="color:var(--muted)">minima are completely dark</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>The formula and its conditions</b>
+    <p style="font-family:var(--mono);font-size:18px;color:var(--cyan);margin:8px 0">x = λD / a</p>
+    <p style="color:var(--muted)">x = fringe separation (centre of one bright fringe to the centre of
+    the <b>next</b>), a = slit separation, D = slit-to-screen distance. Valid only when
+    <b>D ≫ a</b> — which is why D is metres and a is a fraction of a millimetre.</p>
+    <p><b>Measuring x accurately:</b> measure across <b>many</b> fringes (e.g. 10 gaps) and divide.
+    Measuring one fringe gives a huge percentage uncertainty. Saying this earns the mark.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">"What happens to the pattern if…" — the whole family</div>
+    <table>
+      <thead><tr><th>Change</th><th>Fringe separation</th><th>Brightness / other</th></tr></thead>
+      <tbody>
+        <tr><td>λ shorter (red → blue, or UV)</td><td><b>smaller</b> (x ∝ λ)</td><td>—</td></tr>
+        <tr><td>λ longer (blue → red)</td><td><b>larger</b></td><td>—</td></tr>
+        <tr><td>slits moved closer (a smaller)</td><td><b>larger</b> (x ∝ 1/a)</td><td>—</td></tr>
+        <tr><td>screen moved further (D larger)</td><td><b>larger</b></td><td>fringes dimmer</td></tr>
+        <tr><td>amplitude of the source increased</td><td><b>unchanged</b></td><td>all fringes brighter</td></tr>
+        <tr><td>one slit partly covered</td><td><b>unchanged</b></td><td>lower <b>contrast</b>: maxima dimmer, minima <b>no longer completely dark</b></td></tr>
+        <tr><td>one slit fully blocked</td><td>pattern gone</td><td>single-slit diffraction only</td></tr>
+        <tr><td>white light used</td><td>—</td><td>central fringe <b>white</b>, others coloured with <b>blue nearest</b> the centre</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap — units</div>
+    <p>λ in nanometres, a in millimetres, D in metres, x asked for in millimetres. <b>Convert
+    everything to metres first</b>, then convert the answer at the end. More marks are lost here
+    than on the physics.</p>
+  </div>
+</section>
+
+<!-- 7 GRATING -->
+<section id="grating">
+  <h2><span class="num">07</span> The diffraction grating</h2>
+  <p class="sub">Thousands of slits instead of two. The maxima become razor-sharp and are thrown out
+  to large angles, which is why gratings — not double slits — are used to actually measure
+  wavelengths.</p>
+
+  <div class="sim" data-sim="grat">
+    <div class="sim-head"><span class="name">Orders and their angles</span>
+      <span class="hint">try white light</span></div>
+    <canvas height="400"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Lines per mm, N <span data-out="N">500 /mm</span></label>
+        <input type="range" data-p="N" min="100" max="900" step="10" value="500"></div>
+      <div class="ctrl"><label>Wavelength λ <span data-out="lam">550 nm</span></label>
+        <input type="range" data-p="lam" min="400" max="700" step="5" value="550"></div>
+    </div>
+    <div class="btnrow">
+      <button data-act="white">White light</button>
+    </div>
+    <div class="readout">
+      <span>d = 1/N = <b data-out="d">2.00 × 10⁻⁶ m</b></span>
+      <span>highest order n<sub>max</sub> = <b data-out="nmax">3</b></span>
+      <span>total maxima = <b data-out="tot">7</b></span>
+      <span data-out="ang" style="color:var(--muted)">—</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>The grating equation</b>
+    <p style="font-family:var(--mono);font-size:18px;color:var(--cyan);margin:8px 0">d sin θ = nλ</p>
+    <p>d = the <b>grating spacing</b> = distance between the centres of adjacent slits =
+    <span class="eq">1 / N</span>, where N is the number of lines per metre.<br>
+    n = the order (n = 0 is the straight-through central maximum).<br>
+    θ = angle of that order from the normal (the straight-through direction).</p>
+    <p><b>Counting orders</b> — sin θ can never exceed 1, so <span class="eq">n<sub>max</sub> = d/λ</span>
+    <b>rounded DOWN</b> to a whole number. Total number of maxima seen =
+    <span class="eq">2n<sub>max</sub> + 1</span> (both sides, plus the central one).</p>
+    <p style="color:var(--dim);font-size:14px">Edge case worth knowing: if d/λ comes out as an
+    <i>exact</i> whole number, that order would need sin θ = 1, i.e. θ = 90° — it travels along the
+    grating and never reaches a screen. So in that one case take <b>one fewer</b>. Almost every exam
+    question gives you a non-integer, where plain rounding down is the whole answer.</p>
+    <p>Also mind the units: <span class="eq">N</span> is usually <i>quoted</i> in lines per mm, so
+    convert first — 500 lines/mm = 5.00 × 10⁵ lines/m, giving d = 2.00 × 10⁻⁶ m.</p>
+  </div>
+
+  <div class="def">
+    <div class="t">Dispersion — which colour goes furthest?</div>
+    <p>From d sin θ = nλ with d and n fixed: bigger λ ⇒ bigger sin θ ⇒ bigger θ.</p>
+    <p><b>Red</b> (longest λ) is diffracted through the <b>largest</b> angle.<br>
+    <b>Violet/blue</b> (shortest λ) is diffracted through the <b>smallest</b> angle.</p>
+    <p style="color:var(--red)"><b>This is the opposite way round to a prism</b>, where blue bends
+    most. Examiners love the contrast. In a grating spectrum, the <b>zero order is white</b> because
+    all wavelengths have zero path difference there.</p>
+    <p>One consequence that surprises people: at high orders the spectra can <b>overlap</b>. With
+    d = 2.00 × 10⁻⁶ m, violet (430 nm) in the <i>third</i> order sits at 40.2°, while red (680 nm)
+    in the <i>second</i> order sits at 42.8° — so the start of the third-order spectrum appears
+    <i>before</i> the end of the second. Nothing is wrong; the orders simply run into each other.
+    Notice too that red has <b>no</b> third order here (3λ/d = 1.02 &gt; 1), which is why the highest
+    order you can see depends on the colour.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">Worked patterns you should recognise instantly</div>
+    <p><b>"The angle between the two second-order maxima is 59.4°."</b> That's the angle spanning
+    <i>both</i> sides — so θ for one second order is <b>29.7°</b>. Then d = 2λ/sin 29.7°.
+    Forgetting to halve is the single commonest slip in grating questions.</p>
+    <p><b>"How many orders are visible with a 450 lines/mm grating and 630 nm light?"</b><br>
+    d = 1/(450 × 10³) = 2.22 × 10⁻⁶ m. n<sub>max</sub> = d/λ = 2.22×10⁻⁶ / 630×10⁻⁹ = 3.53 → <b>3</b>.
+    Total maxima = 2(3) + 1 = <b>7</b>.</p>
+    <p><b>"…and with blue light instead?"</b> Shorter λ ⇒ d/λ larger ⇒ <b>more</b> orders.</p>
+  </div>
+</section>
+
+<!-- RADAR -->
+<section id="radar">
+  <h2><span class="num">★</span> Exam radar — where the marks actually are</h2>
+  <p class="sub">Built from the 25 structured questions in your P8 pack (CAIE 9702).</p>
+
+  <table>
+    <thead><tr><th>Skill</th><th>How often</th><th>Typical tariff</th></tr></thead>
+    <tbody>
+      <tr><td>Explain how a stationary wave is formed (the 3 conditions)</td><td><span class="pill hot">very high</span></td><td>2–3</td></tr>
+      <tr><td>Identify nodes/antinodes; use λ/2 and λ/4 spacings</td><td><span class="pill hot">very high</span></td><td>2–3</td></tr>
+      <tr><td>Air-column resonance: find λ, f or L</td><td><span class="pill hot">very high</span></td><td>3–4</td></tr>
+      <tr><td>Define / apply <b>coherence</b></td><td><span class="pill hot">very high</span></td><td>1–2</td></tr>
+      <tr><td>Path difference → maximum or minimum</td><td><span class="pill hot">very high</span></td><td>2–3</td></tr>
+      <tr><td>x = λD/a calculation + "what changes if…"</td><td><span class="pill hot">very high</span></td><td>3–5</td></tr>
+      <tr><td>d sin θ = nλ; number of orders; d = 1/N</td><td><span class="pill hot">very high</span></td><td>3–5</td></tr>
+      <tr><td>Stationary vs progressive comparison</td><td><span class="pill warm">high</span></td><td>2–3</td></tr>
+      <tr><td>Define diffraction / draw diffracted wavefronts</td><td><span class="pill warm">high</span></td><td>2</td></tr>
+      <tr><td>Stretched string harmonics; sketch at t + Δt</td><td><span class="pill warm">high</span></td><td>2–4</td></tr>
+      <tr><td>Measure the speed of sound (CRO + reflector, or resonance tube)</td><td>medium</td><td>3–4</td></tr>
+      <tr><td>Draw a two-source ripple-tank pattern (mark X maxima, N minima)</td><td>medium</td><td>2–3</td></tr>
+      <tr><td>Dispersion by a grating; which colour deviates most</td><td>medium</td><td>2</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>Instant-recall sheet (print this)</summary>
+    <table>
+      <tbody>
+        <tr><td>Superposition</td><td class="eq">resultant displacement = sum of displacements</td></tr>
+        <tr><td>Node spacing</td><td class="eq">λ/2  (node → antinode = λ/4)</td></tr>
+        <tr><td>String / open pipe</td><td class="eq">L = nλ/2 ,  f<sub>n</sub> = nc/2L</td></tr>
+        <tr><td>Closed pipe</td><td class="eq">L = (2n−1)λ/4 ,  f<sub>n</sub> = (2n−1)c/4L  (odd harmonics only)</td></tr>
+        <tr><td>Resonance tube</td><td class="eq">v = f × 2(L₂ − L₁)   (eliminates end correction)</td></tr>
+        <tr><td>Maxima</td><td class="eq">path diff = nλ ,  phase diff = n(360°)</td></tr>
+        <tr><td>Minima</td><td class="eq">path diff = (n − ½)λ</td></tr>
+        <tr><td>Young's slits</td><td class="eq">x = λD/a</td></tr>
+        <tr><td>Grating</td><td class="eq">d sin θ = nλ ,  d = 1/N ,  n<sub>max</sub> = ⌊d/λ⌋</td></tr>
+        <tr><td>Diffraction is greatest when</td><td class="eq">gap width a ≈ λ</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <div class="exam">
+    <div class="t">Three sentences worth memorising word for word</div>
+    <p>1. "A stationary wave is formed by the <b>superposition of two progressive waves of the same
+    frequency and amplitude travelling in opposite directions</b>."</p>
+    <p>2. "Coherent means the two waves have a <b>constant phase difference</b>."</p>
+    <p>3. "Diffraction is the <b>spreading of a wave as it passes through a gap or around an
+    obstacle</b>, and is greatest when the gap is <b>comparable to the wavelength</b>."</p>
+  </div>
+</section>
+
+<div class="foot">
+  AS Physics 9702 · Chapter 8 · interactive notes.
+  <a href="index.html" style="color:var(--violet)">← back to the hub</a> ·
+  <a href="C7-Waves.html" style="color:var(--violet)">← Chapter 7: Waves</a>
+</div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+const sims=[];
+function fit(cv){
+  const dpr=window.devicePixelRatio||1;
+  // NOTE: assigning cv.height reflects back into the height attribute, so the
+  // design height must be cached on first fit — re-reading it would multiply by
+  // dpr on every ResizeObserver tick and blow the canvas up to millions of px.
+  if(!cv.dataset.baseh) cv.dataset.baseh=parseInt(cv.getAttribute('height'),10)||400;
+  const w=cv.clientWidth, h=parseInt(cv.dataset.baseh,10);
+  cv.style.height=h+'px';
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w,h};
+}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function out(root,key,val){const e=root.querySelector('[data-out="'+key+'"]'); if(e)e.textContent=val;}
+function reg(root,init){
+  const cv=root.querySelector('canvas');
+  const state={root,cv,vis:true};
+  const api=init(state); state.api=api;
+  const relayout=()=>{const g=fit(cv);state.ctx=g.ctx;state.w=g.w;state.h=g.h;};
+  relayout();
+  new ResizeObserver(()=>{relayout(); if(api.draw)api.draw(state.t||0);}).observe(cv);
+  new IntersectionObserver(es=>{state.vis=es[0].isIntersecting;},{threshold:0}).observe(cv);
+  sims.push(state);
+  root.querySelectorAll('input[type=range]').forEach(inp=>{
+    const f=()=>{ if(api.onInput)api.onInput(inp.dataset.p, parseFloat(inp.value)); };
+    inp.addEventListener('input',f); f();
+  });
+  root.querySelectorAll('button[data-act]').forEach(b=>{
+    b.addEventListener('click',()=>{ if(api.onBtn)api.onBtn(b.dataset.act,b); });
+  });
+  if(api.onPoint){
+    const P=e=>{const r=cv.getBoundingClientRect();
+      const t=e.touches?e.touches[0]:e;
+      api.onPoint(t.clientX-r.left,t.clientY-r.top);};
+    let down=false;
+    cv.addEventListener('pointerdown',e=>{down=true;cv.setPointerCapture(e.pointerId);P(e);});
+    cv.addEventListener('pointermove',e=>{if(down)P(e);});
+    cv.addEventListener('pointerup',()=>{down=false;});
+    cv.addEventListener('pointerleave',()=>{down=false;});
+  }
+  return state;
+}
+let t0=performance.now();
+function loop(now){
+  const t=(now-t0)/1000;
+  for(const s of sims){ s.t=t; if(s.vis&&s.api.draw) s.api.draw(t); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+function grid(ctx,x,y,w,h,step,col){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1;ctx.globalAlpha=.5;ctx.beginPath();
+  for(let gx=x;gx<=x+w+.5;gx+=step){ctx.moveTo(Math.round(gx)+.5,y);ctx.lineTo(Math.round(gx)+.5,y+h);}
+  for(let gy=y;gy<=y+h+.5;gy+=step){ctx.moveTo(x,Math.round(gy)+.5);ctx.lineTo(x+w,Math.round(gy)+.5);}
+  ctx.stroke();ctx.restore();
+}
+
+/* ===== 1. SUPERPOSITION ADDER ===== */
+const addRoot=document.querySelector('[data-sim="add"]');
+if(addRoot) reg(addRoot,(S)=>{
+  const P={a2:1,ph:0}; let anim=true, ph=0, last=null;   // markup ships the button as class="on" / "⏸ Freeze"
+  function upd(){
+    out(S.root,'a2',P.a2.toFixed(2));
+    out(S.root,'ph',P.ph.toFixed(0)+'°');
+    const r=P.ph*Math.PI/180;
+    const res=Math.sqrt(1+P.a2*P.a2+2*P.a2*Math.cos(r));
+    out(S.root,'res',res.toFixed(2));
+    const el=S.root.querySelector('[data-out="kind"]');
+    let txt,col;
+    if(P.ph<8||P.ph>352){txt='constructive — resultant amplitude = A₁ + A₂';col=css('--lime');}
+    else if(Math.abs(P.ph-180)<8){
+      txt=Math.abs(1-P.a2)<0.03?'destructive — resultant is ZERO':'destructive — resultant = |A₁ − A₂|, not zero';
+      col=css('--red');}
+    else {txt='partial superposition';col=css('--muted');}
+    out(S.root,'kind',txt); if(el)el.style.color=col;
+  }
+  function onInput(k,v){P[k]=v;upd();}
+  function onBtn(a,b){
+    const set=(deg)=>{const s=S.root.querySelector('input[data-p="ph"]');s.value=deg;P.ph=deg;upd();};
+    if(a==='p0')set(0); if(a==='p180')set(180); if(a==='p90')set(90);
+    if(a==='anim'){anim=!anim;b.classList.toggle('on',anim);b.textContent=anim?'⏸ Freeze':'▶ Animate';}
+  }
+  function draw(t){
+    if(last===null)last=t; const dt=t-last; last=t; if(anim) ph+=dt*0.3;
+    const {ctx,w,h}=S; ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--cyan'),V=css('--violet'),LI=css('--lime');
+    const padL=34,gw=w-padL-20, lam=gw/2.2;
+    function panel(cy,gh,label){
+      grid(ctx,padL,cy-gh/2,gw,gh,gw/22,L);
+      ctx.strokeStyle=M;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(padL,cy);ctx.lineTo(padL+gw,cy);ctx.stroke();
+      ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText(label,padL+4,cy-gh/2+13);
+    }
+    const y1=70,y2=180,y3=310, gh=84, gh3=140;
+    panel(y1,gh,'wave 1   (amplitude 1.0)');
+    panel(y2,gh,'wave 2   (amplitude '+P.a2.toFixed(2)+', shifted '+P.ph.toFixed(0)+'°)');
+    panel(y3,gh3,'RESULTANT  =  wave 1  +  wave 2   (add the displacements at every point)');
+    const r=P.ph*Math.PI/180;
+    const f1=x=>Math.sin(2*Math.PI*(x/lam-ph));
+    const f2=x=>P.a2*Math.sin(2*Math.PI*(x/lam-ph)-r);
+    function plot(fn,cy,scale,col,lw){
+      ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const yy=cy-fn(i)*scale; i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+    }
+    plot(f1,y1,gh/2-8,C,2.4);
+    plot(f2,y2,gh/2-8,V,2.4);
+    // ghosts on resultant
+    ctx.globalAlpha=.3;
+    plot(f1,y3,gh3/2/2.2,C,1.6);
+    plot(f2,y3,gh3/2/2.2,V,1.6);
+    ctx.globalAlpha=1;
+    plot(x=>f1(x)+f2(x),y3,gh3/2/2.2,LI,3);
+    // vertical add markers
+    ctx.strokeStyle=M;ctx.globalAlpha=.5;ctx.lineWidth=1;ctx.setLineDash([2,3]);
+    for(let k=1;k<7;k++){
+      const x=padL+k*gw/7;
+      ctx.beginPath();ctx.moveTo(x,y1-gh/2);ctx.lineTo(x,y3+gh3/2);ctx.stroke();
+    }
+    ctx.setLineDash([]);ctx.globalAlpha=1;
+    upd();
+  }
+  return {onInput,onBtn,draw};
+});
+
+/* ===== 2. STATIONARY WAVE ===== */
+const stRoot=document.querySelector('[data-sim="stat"]');
+if(stRoot) reg(stRoot,(S)=>{
+  const P={n:3}; let anim=true, comp=true, env=false, lab=true, ph=0, last=null;
+  function onInput(k,v){P[k]=Math.round(v);
+    out(S.root,'n',P.n);
+    out(S.root,'lam','λ = 2L/'+P.n+'  ·  '+(P.n)+' loops  ·  '+(P.n+1)+' nodes');
+  }
+  function onBtn(a,b){
+    if(a==='anim'){anim=!anim;b.classList.toggle('on',anim);b.textContent=anim?'⏸ Pause':'▶ Play';}
+    if(a==='comp'){comp=!comp;b.classList.toggle('on',comp);}
+    if(a==='env'){env=!env;b.classList.toggle('on',env);}
+    if(a==='lab'){lab=!lab;b.classList.toggle('on',lab);}
+    if(a==='step'){ph+=0.25;}
+  }
+  function draw(t){
+    if(last===null)last=t; const dt=t-last; last=t; if(anim) ph+=dt*0.28;
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--cyan'),V=css('--violet'),
+          LI=css('--lime'),PK=css('--pink'),AM=css('--amber');
+    const padL=34,gw=w-padL-24;
+    const k=P.n*Math.PI/gw;   // so that sin(k*gw)=0 -> n loops
+    const A=52;
+    // ---- component waves ----
+    if(comp){
+      const cy1=76;
+      ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('two progressive waves, SAME frequency & amplitude, travelling in OPPOSITE directions',padL,26);
+      ctx.strokeStyle=M;ctx.lineWidth=1;ctx.globalAlpha=.4;
+      ctx.beginPath();ctx.moveTo(padL,cy1);ctx.lineTo(padL+gw,cy1);ctx.stroke();ctx.globalAlpha=1;
+      ctx.strokeStyle=C;ctx.lineWidth=1.8;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const yy=cy1-A*0.5*Math.sin(k*i-2*Math.PI*ph);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+      ctx.strokeStyle=PK;ctx.lineWidth=1.8;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const yy=cy1-A*0.5*Math.sin(k*i+2*Math.PI*ph);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+      ctx.fillStyle=C;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('incident  →',padL+2,cy1-A*0.5-8);
+      ctx.fillStyle=PK;ctx.textAlign='right';
+      ctx.fillText('←  reflected',padL+gw-2,cy1-A*0.5-8);
+    }
+    // ---- resultant ----
+    const cy=comp?270:180;
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('their superposition — a STATIONARY wave. The pattern does not move.',padL,cy-A-34);
+    // walls
+    ctx.strokeStyle=M;ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(padL,cy-A-16);ctx.lineTo(padL,cy+A+16);
+    ctx.moveTo(padL+gw,cy-A-16);ctx.lineTo(padL+gw,cy+A+16);ctx.stroke();
+    ctx.strokeStyle=L;ctx.lineWidth=1;ctx.globalAlpha=.5;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(padL,cy);ctx.lineTo(padL+gw,cy);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+    const amp=Math.cos(2*Math.PI*ph);
+    if(env){
+      ctx.strokeStyle=V;ctx.globalAlpha=.4;ctx.lineWidth=1.4;ctx.setLineDash([4,4]);
+      for(const s of [1,-1]){
+        ctx.beginPath();
+        for(let i=0;i<=gw;i++){const yy=cy-s*A*Math.sin(k*i);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);ctx.globalAlpha=1;
+    }
+    // ghost snapshots
+    ctx.strokeStyle=V;ctx.globalAlpha=.18;ctx.lineWidth=1.4;
+    for(const g of [0.25,0.5,0.75]){
+      const a2=Math.cos(2*Math.PI*(ph+g));
+      ctx.beginPath();
+      for(let i=0;i<=gw;i++){const yy=cy-A*a2*Math.sin(k*i);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=LI;ctx.lineWidth=3.2;ctx.beginPath();
+    for(let i=0;i<=gw;i++){const yy=cy-A*amp*Math.sin(k*i);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+    ctx.stroke();
+    if(lab){
+      for(let j=0;j<=P.n;j++){
+        const x=padL+j*gw/P.n;
+        ctx.fillStyle=PK;ctx.beginPath();ctx.arc(x,cy,4.5,0,7);ctx.fill();
+        ctx.fillStyle=PK;ctx.font='bold 12px ui-monospace,monospace';ctx.textAlign='center';
+        ctx.fillText('N',x,cy+A+34);
+      }
+      for(let j=0;j<P.n;j++){
+        const x=padL+(j+0.5)*gw/P.n;
+        ctx.fillStyle=AM;ctx.font='bold 12px ui-monospace,monospace';ctx.textAlign='center';
+        ctx.fillText('A',x,cy+A+34);
+      }
+      // lambda/2 bracket
+      const x1=padL, x2=padL+gw/P.n, yb=cy+A+52;
+      ctx.strokeStyle=V;ctx.lineWidth=1.6;ctx.beginPath();
+      ctx.moveTo(x1,yb);ctx.lineTo(x2,yb);
+      ctx.moveTo(x1,yb-5);ctx.lineTo(x1,yb+5);ctx.moveTo(x2,yb-5);ctx.lineTo(x2,yb+5);ctx.stroke();
+      ctx.fillStyle=V;ctx.textAlign='center';ctx.font='bold 12px ui-monospace,monospace';
+      ctx.fillText('λ/2',(x1+x2)/2,yb+18);
+      ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('N = node (always zero)      A = antinode (maximum amplitude)',padL,h-8);
+    }
+    // L marker
+    ctx.strokeStyle=M;ctx.lineWidth=1.2;ctx.globalAlpha=.7;
+    ctx.beginPath();ctx.moveTo(padL,cy-A-24);ctx.lineTo(padL+gw,cy-A-24);ctx.stroke();ctx.globalAlpha=1;
+    ctx.fillStyle=M;ctx.textAlign='center';ctx.font='11px ui-monospace,monospace';
+    ctx.fillText('L',padL+gw/2,cy-A-28);
+  }
+  return {onInput,onBtn,draw};
+});
+
+/* ===== 3. HARMONICS ===== */
+const hRoot=document.querySelector('[data-sim="harm"]');
+if(hRoot) reg(hRoot,(S)=>{
+  const P={n:1,L:1,c:340}; let sys='string', anim=true, ph=0, last=null;
+  function calc(){
+    let lam, rel, ordN;
+    if(sys==='closed'){ ordN=2*P.n-1; lam=4*P.L/ordN; rel='L = '+(ordN===1?'':ordN)+'λ/4'; }
+    // nλ/2 shown in lowest terms, so n = 2 reads "L = λ" and not "L = 2λ/2"
+    else { ordN=P.n; lam=2*P.L/ordN; rel='L = '+(ordN%2===0?(ordN/2===1?'':ordN/2)+'λ':(ordN===1?'':ordN)+'λ/2'); }
+    return {lam, rel, ordN, f:P.c/lam};
+  }
+  function upd(){
+    const r=calc();
+    out(S.root,'n',P.n); out(S.root,'L',P.L.toFixed(2)+' m');
+    out(S.root,'c',P.c.toFixed(0)+' m s⁻¹');
+    out(S.root,'rel',r.rel);
+    out(S.root,'lam',r.lam.toFixed(3)+' m');
+    out(S.root,'f',r.f<1000?r.f.toFixed(1)+' Hz':(r.f/1000).toFixed(2)+' kHz');
+    const nm=['fundamental (1st harmonic)','2nd harmonic','3rd harmonic','4th harmonic','5th harmonic',
+              '6th harmonic','7th harmonic','8th harmonic','9th harmonic'];
+    out(S.root,'ord', nm[r.ordN-1] + (sys==='closed'?'  —  only ODD harmonics exist':''));
+  }
+  function onInput(k,v){P[k]= (k==='n')?Math.round(v):v; upd();}
+  function onBtn(a,b){
+    if(a==='anim'){anim=!anim;b.classList.toggle('on',anim);b.textContent=anim?'⏸ Pause':'▶ Play';return;}
+    sys=a;
+    S.root.querySelectorAll('button[data-act]').forEach(x=>{
+      if(x.dataset.act!=='anim') x.classList.toggle('on',x.dataset.act===a);});
+    upd();
+  }
+  function draw(t){
+    if(last===null)last=t; const dt=t-last; last=t; if(anim) ph+=dt*0.3;
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),L=css('--line'),LI=css('--lime'),PK=css('--pink'),
+          AM=css('--amber'),V=css('--violet'),C=css('--cyan');
+    const padL=40,gw=w-padL-40,cy=h/2+6,A=58;
+    const r=calc();
+    const amp=Math.cos(2*Math.PI*ph);
+    // pipe body
+    if(sys!=='string'){
+      ctx.strokeStyle=M;ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(padL,cy-A-14);ctx.lineTo(padL+gw,cy-A-14);
+      ctx.moveTo(padL,cy+A+14);ctx.lineTo(padL+gw,cy+A+14);
+      if(sys==='closed'){ctx.moveTo(padL+gw,cy-A-14);ctx.lineTo(padL+gw,cy+A+14);}
+      ctx.stroke();
+      ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+      ctx.fillText(sys==='closed'?'closed end (NODE)':'open end (ANTINODE)',padL+gw-56,cy+A+32);
+      ctx.fillText('open end (ANTINODE)',padL+56,cy+A+32);
+    } else {
+      ctx.strokeStyle=M;ctx.lineWidth=4;
+      ctx.beginPath();ctx.moveTo(padL,cy-A-16);ctx.lineTo(padL,cy+A+16);
+      ctx.moveTo(padL+gw,cy-A-16);ctx.lineTo(padL+gw,cy+A+16);ctx.stroke();
+      ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+      ctx.fillText('fixed end (NODE)',padL+50,cy+A+32);
+      ctx.fillText('fixed end (NODE)',padL+gw-50,cy+A+32);
+    }
+    ctx.strokeStyle=L;ctx.setLineDash([3,4]);ctx.lineWidth=1;ctx.globalAlpha=.6;
+    ctx.beginPath();ctx.moveTo(padL,cy);ctx.lineTo(padL+gw,cy);ctx.stroke();
+    ctx.setLineDash([]);ctx.globalAlpha=1;
+    // shape function: node at x=0 for string & closed-at-right? define per system
+    // string: nodes at both ends -> sin(n pi x/L)
+    // open: antinodes at both ends -> cos(n pi x/L)
+    // closed (closed at RIGHT end): antinode at x=0, node at x=gw -> cos((2m-1) pi x /(2L))
+    let f;
+    if(sys==='string') f=(u)=>Math.sin(P.n*Math.PI*u);
+    else if(sys==='open') f=(u)=>Math.cos(P.n*Math.PI*u);
+    else f=(u)=>Math.cos((2*P.n-1)*Math.PI*u/2);
+    // envelope
+    ctx.strokeStyle=V;ctx.globalAlpha=.35;ctx.lineWidth=1.4;ctx.setLineDash([4,4]);
+    for(const s of [1,-1]){
+      ctx.beginPath();
+      for(let i=0;i<=gw;i++){const yy=cy-s*A*f(i/gw);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);ctx.globalAlpha=1;
+    ctx.strokeStyle=sys==='string'?LI:C;ctx.lineWidth=3.2;ctx.beginPath();
+    for(let i=0;i<=gw;i++){const yy=cy-A*amp*f(i/gw);i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+    ctx.stroke();
+    // mark N and A — positions come straight from the mode function, NOT from sampling it.
+    // (sampling missed the node at u = 0 for n >= 3, and double-drew antinode labels.)
+    let nodes, antis;
+    if(sys==='string'){                       // sin(nπu): N at k/n, A at (k+½)/n
+      nodes=[]; antis=[];
+      for(let k=0;k<=P.n;k++) nodes.push(k/P.n);
+      for(let k=0;k<P.n;k++) antis.push((k+0.5)/P.n);
+    } else if(sys==='open'){                  // cos(nπu): the other way round
+      nodes=[]; antis=[];
+      for(let k=0;k<P.n;k++) nodes.push((k+0.5)/P.n);
+      for(let k=0;k<=P.n;k++) antis.push(k/P.n);
+    } else {                                  // cos(mπu/2), m = 2n−1: N at (2k+1)/m, A at 2k/m
+      const m=2*P.n-1; nodes=[]; antis=[];
+      for(let k=0;(2*k+1)/m<=1.0001;k++) nodes.push((2*k+1)/m);
+      for(let k=0;(2*k)/m<=1.0001;k++)   antis.push((2*k)/m);
+    }
+    ctx.font='bold 12px ui-monospace,monospace';ctx.textAlign='center';
+    nodes.forEach(u=>{
+      const x=padL+u*gw;
+      ctx.fillStyle=PK;ctx.beginPath();ctx.arc(x,cy,4.5,0,7);ctx.fill();
+      ctx.fillStyle=PK;ctx.fillText('N',x,cy+A+52);
+    });
+    antis.forEach(u=>{
+      ctx.fillStyle=AM;ctx.fillText('A',padL+u*gw,cy+A+52);
+    });
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    const title={string:'STRETCHED STRING — node at each fixed end',
+      open:'OPEN PIPE — antinode at each open end',
+      closed:'CLOSED PIPE — antinode at the open end, node at the closed end'}[sys];
+    ctx.fillText(title,padL,22);
+    ctx.textAlign='right';ctx.fillStyle=V;ctx.font='bold 13px ui-monospace,monospace';
+    ctx.fillText(r.rel,padL+gw,22);
+  }
+  return {onInput,onBtn,draw};
+});
+
+/* ===== 4. DIFFRACTION ===== */
+const dfRoot=document.querySelector('[data-sim="diff"]');
+if(dfRoot) reg(dfRoot,(S)=>{
+  const P={a:3,lam:24};
+  function upd(){
+    out(S.root,'a',P.a.toFixed(1)+' λ');
+    out(S.root,'lam',P.lam.toFixed(0)+' px');
+    out(S.root,'ratio',P.a.toFixed(1));
+    let v;
+    if(P.a<0.9) v='gap ≲ λ  →  nearly semicircular wavefronts — MAXIMUM spreading';
+    else if(P.a<1.8) v='gap ≈ λ  →  strong diffraction (this is the exam’s "most noticeable" case)';
+    else if(P.a<4) v='gap a few λ  →  moderate spreading, flat in the middle';
+    else v='gap ≫ λ  →  wave passes almost straight through, only edges curl';
+    out(S.root,'verdict',v);
+  }
+  function onInput(k,v){P[k]=v;upd();}
+  function draw(t){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),C=css('--cyan'),L=css('--line');
+    const bx=Math.round(w*0.32);
+    const gap=P.a*P.lam;
+    const cy=h/2;
+    const g1=cy-gap/2, g2=cy+gap/2;
+    // incoming plane waves
+    ctx.strokeStyle=C;ctx.lineWidth=2;ctx.globalAlpha=.75;
+    for(let x=bx-P.lam*0.5; x>0; x-=P.lam){
+      const off=(t*22)%P.lam;
+      const xx=x+off; if(xx>bx-2||xx<0)continue;
+      ctx.beginPath();ctx.moveTo(xx,14);ctx.lineTo(xx,h-14);ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    // barrier
+    ctx.fillStyle=M;
+    ctx.fillRect(bx-3,10,6,Math.max(0,g1-10));
+    ctx.fillRect(bx-3,g2,6,Math.max(0,h-10-g2));
+    // diffracted: superpose Huygens sources across the gap
+    ctx.save();
+    ctx.beginPath();ctx.rect(bx+3,6,w-bx-9,h-12);ctx.clip();
+    const off=(t*22)%P.lam;
+    // Huygens picture: straight ahead the front stays PLANE across the gap; each edge
+    // launches a circular curl whose angular reach is asin(λ/a). Wide gap -> flat middle,
+    // tiny curls. Gap ≈ λ -> reach 90°, so the front is essentially a semicircle.
+    const spread=Math.asin(Math.min(1,P.lam/gap));
+    for(let r=P.lam*0.6; r<w*1.4; r+=P.lam){
+      const rr=r+off;
+      ctx.strokeStyle=C;ctx.lineWidth=2;
+      ctx.globalAlpha=Math.max(0.06,0.7-rr/(w*1.2)*0.6);
+      const x0=bx+3+rr;
+      ctx.beginPath();
+      ctx.moveTo(x0,g1);ctx.lineTo(x0,g2);                       // plane segment
+      for(let a=0.02;a<=spread;a+=0.02)                          // lower edge curl
+        ctx.lineTo(bx+3+rr*Math.cos(a), g2+rr*Math.sin(a));
+      ctx.moveTo(x0,g1);
+      for(let a=0.02;a<=spread;a+=0.02)                          // upper edge curl
+        ctx.lineTo(bx+3+rr*Math.cos(a), g1-rr*Math.sin(a));
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.globalAlpha=1;
+    // gap markers
+    ctx.strokeStyle=css('--amber');ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.moveTo(bx-14,g1);ctx.lineTo(bx-14,g2);
+    ctx.moveTo(bx-19,g1);ctx.lineTo(bx-9,g1);ctx.moveTo(bx-19,g2);ctx.lineTo(bx-9,g2);ctx.stroke();
+    ctx.save();ctx.fillStyle=css('--amber');ctx.translate(bx-26,cy);ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center';ctx.font='bold 12px ui-monospace,monospace';ctx.fillText('a',0,0);ctx.restore();
+    // lambda marker
+    ctx.strokeStyle=css('--violet');ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.moveTo(16,h-22);ctx.lineTo(16+P.lam,h-22);
+    ctx.moveTo(16,h-27);ctx.lineTo(16,h-17);ctx.moveTo(16+P.lam,h-27);ctx.lineTo(16+P.lam,h-17);ctx.stroke();
+    ctx.fillStyle=css('--violet');ctx.textAlign='center';ctx.font='bold 11px ui-monospace,monospace';
+    ctx.fillText('λ',16+P.lam/2,h-30);
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('plane wavefronts in',10,20);
+    ctx.textAlign='right';
+    ctx.fillText('spacing between wavefronts is UNCHANGED — λ does not change',w-10,20);
+  }
+  return {onInput,draw};
+});
+
+/* ===== 5. TWO SOURCE ===== */
+const twRoot=document.querySelector('[data-sim="two"]');
+if(twRoot) reg(twRoot,(S)=>{
+  const P={d:120,lam:34}; let anim=true, lines=false, ph=0, last=null;  // button ships as class="on" / "⏸ Freeze"
+  let px=null,py=null, img=null, iw=0, ih=0;
+  function onInput(k,v){P[k]=v;
+    out(S.root,'d',P.d.toFixed(0)+' px'); out(S.root,'lam',P.lam.toFixed(0)+' px'); img=null;}
+  function onBtn(a,b){
+    if(a==='lines'){lines=!lines;b.classList.toggle('on',lines);}
+    if(a==='anim'){anim=!anim;b.classList.toggle('on',anim);b.textContent=anim?'⏸ Freeze':'▶ Animate';img=null;}
+  }
+  function onPoint(x,y){px=x;py=y;}
+  function draw(t){
+    if(last===null)last=t; const dt=t-last; last=t; if(anim){ph+=dt*0.6; img=null;}
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),LI=css('--lime'),PK=css('--pink'),AM=css('--amber'),V=css('--violet');
+    const sx=Math.round(w*0.14), s1y=Math.round(h/2-P.d/2), s2y=Math.round(h/2+P.d/2);
+    if(px===null){px=Math.round(w*0.72); py=Math.round(h*0.32);}
+    // field via ImageData (downsampled x2)
+    const step=2;
+    if(!img || iw!==Math.ceil(w/step) || ih!==Math.ceil(h/step)){
+      iw=Math.ceil(w/step); ih=Math.ceil(h/step); img=ctx.createImageData(iw,ih);
+    }
+    const dark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    const isLight=matchMedia('(prefers-color-scheme: light)').matches;
+    const D=img.data;
+    for(let j=0;j<ih;j++){
+      const y=j*step;
+      for(let i=0;i<iw;i++){
+        const x=i*step;
+        const r1=Math.hypot(x-sx,y-s1y), r2=Math.hypot(x-sx,y-s2y);
+        const a=Math.cos(2*Math.PI*(r1/P.lam-ph))/Math.sqrt(Math.max(8,r1))
+              + Math.cos(2*Math.PI*(r2/P.lam-ph))/Math.sqrt(Math.max(8,r2));
+        const v=Math.max(-1,Math.min(1,a*3.2));
+        const o=(j*iw+i)*4;
+        if(isLight){
+          D[o]=255-Math.round(Math.max(0,-v)*150);
+          D[o+1]=255-Math.round(Math.abs(v)*95);
+          D[o+2]=255-Math.round(Math.max(0,v)*40);
+          D[o+3]=200;
+        } else {
+          D[o]=Math.round(Math.max(0,v)*40+8);
+          D[o+1]=Math.round(Math.max(0,v)*150+14);
+          D[o+2]=Math.round(Math.max(0,v)*190+22)+Math.round(Math.max(0,-v)*40);
+          D[o+3]=235;
+        }
+      }
+    }
+    // blit scaled
+    const off=document.createElement('canvas'); off.width=iw; off.height=ih;
+    off.getContext('2d').putImageData(img,0,0);
+    ctx.imageSmoothingEnabled=true;
+    ctx.drawImage(off,0,0,w,h);
+
+    if(lines){
+      // draw hyperbolic maxima/minima loci by scanning right edge column-wise
+      ctx.lineWidth=1.4;
+      for(let n=-6;n<=6;n++){
+        for(const kind of [0,0.5]){
+          const target=(n+kind)*P.lam;
+          ctx.strokeStyle= kind===0?AM:PK; ctx.globalAlpha=kind===0?.8:.45;
+          ctx.beginPath(); let started=false;
+          for(let y=0;y<h;y+=2){
+            // solve along x
+            let lo=sx, hi=w*1.6, ok=false, xm=0;
+            const g=(x)=>Math.hypot(x-sx,y-s1y)-Math.hypot(x-sx,y-s2y)-target;
+            let a=g(lo), b=g(hi);
+            if(a*b<=0){
+              for(let it=0;it<28;it++){xm=(lo+hi)/2; const c=g(xm); if(a*c<=0){hi=xm;b=c;}else{lo=xm;a=c;}}
+              ok=true;
+            }
+            if(ok && xm>sx-2 && xm<w){ if(!started){ctx.moveTo(xm,y);started=true;} else ctx.lineTo(xm,y);}
+            else started=false;
+          }
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha=1;
+      ctx.fillStyle=AM;ctx.font='10px ui-monospace,monospace';ctx.textAlign='right';
+      ctx.fillText('solid = MAXIMA (path diff = nλ)',w-10,h-24);
+      ctx.fillStyle=PK;ctx.fillText('faint = MINIMA (path diff = (n−½)λ)',w-10,h-10);
+    }
+
+    // sources
+    [[s1y,'S₁'],[s2y,'S₂']].forEach(([y,lab])=>{
+      ctx.fillStyle=PK;ctx.beginPath();ctx.arc(sx,y,6,0,7);ctx.fill();
+      ctx.fillStyle='#fff';ctx.strokeStyle=PK;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(sx,y,6,0,7);ctx.stroke();
+      ctx.fillStyle=PK;ctx.font='bold 12px ui-monospace,monospace';ctx.textAlign='right';
+      ctx.fillText(lab,sx-10,y+4);
+    });
+    // point P and rays
+    const r1=Math.hypot(px-sx,py-s1y), r2=Math.hypot(px-sx,py-s2y);
+    ctx.strokeStyle=V;ctx.lineWidth=1.6;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(sx,s1y);ctx.lineTo(px,py);ctx.moveTo(sx,s2y);ctx.lineTo(px,py);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#fff';ctx.strokeStyle=V;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(px,py,7,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle=V;ctx.font='bold 13px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('P',px+11,py-8);
+    const pd=Math.abs(r1-r2)/P.lam;
+    out(S.root,'r1',r1.toFixed(0)+' px = '+(r1/P.lam).toFixed(2)+' λ');
+    out(S.root,'r2',r2.toFixed(0)+' px = '+(r2/P.lam).toFixed(2)+' λ');
+    out(S.root,'pd',pd.toFixed(2)+' λ');
+    const near=Math.abs(pd-Math.round(pd));
+    const el=S.root.querySelector('[data-out="verdict"]');
+    let txt,col;
+    // Judge on the resultant amplitude, not on pd. A fixed ±0.08 λ window is misleading because
+    // cos is FLAT near a maximum but STEEP near a minimum: 0.08 λ off an integer costs 0.4% of the
+    // amplitude, while 0.08 λ off a half-integer still leaves 25% of it — which is not "destructive".
+    const rel=Math.abs(Math.cos(Math.PI*near));   // resultant amplitude ÷ maximum, 1 = max, 0 = min
+    if(rel>0.99){txt='whole number of λ  →  MAXIMUM (constructive)';col=LI;}
+    else if(rel<0.1){txt='half-integer λ  →  MINIMUM (destructive)';col=PK;}
+    else {txt='in between — partial';col=M;}
+    out(S.root,'verdict',txt); if(el)el.style.color=col;
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('drag P anywhere →  path difference = |S₁P − S₂P|',10,18);
+  }
+  return {onInput,onBtn,onPoint,draw};
+});
+
+/* ===== 6. YOUNG ===== */
+const ysRoot=document.querySelector('[data-sim="young"]');
+if(ysRoot) reg(ysRoot,(S)=>{
+  const P={lam:550,a:0.5,D:2,b:1};
+  function wl2rgb(nm){
+    let r=0,g=0,b=0;
+    if(nm<440){r=-(nm-440)/60;b=1;}
+    else if(nm<490){g=(nm-440)/50;b=1;}
+    else if(nm<510){g=1;b=-(nm-510)/20;}
+    else if(nm<580){r=(nm-510)/70;g=1;}
+    else if(nm<645){r=1;g=-(nm-645)/65;}
+    else {r=1;}
+    let f=1;
+    if(nm<420)f=0.3+0.7*(nm-380)/40; else if(nm>700)f=0.3+0.7*(780-nm)/80;
+    return [Math.round(255*Math.pow(Math.max(0,r)*f,0.8)),
+            Math.round(255*Math.pow(Math.max(0,g)*f,0.8)),
+            Math.round(255*Math.pow(Math.max(0,b)*f,0.8))];
+  }
+  function upd(){
+    out(S.root,'lam',P.lam.toFixed(0)+' nm');
+    out(S.root,'a',P.a.toFixed(2)+' mm');
+    out(S.root,'D',P.D.toFixed(1)+' m');
+    out(S.root,'b',(P.b*100).toFixed(0)+' %');
+    const x=P.lam*1e-9*P.D/(P.a*1e-3);
+    out(S.root,'x',(x*1000).toFixed(2)+' mm');
+    out(S.root,'note', P.b>0.97?'equal amplitudes → minima are completely dark'
+      : P.b<0.03?'one slit blocked → no interference pattern'
+      : 'unequal amplitudes → poorer CONTRAST: minima are not completely dark');
+  }
+  function onInput(k,v){P[k]=v;upd();}
+  function draw(t){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),L=css('--line');
+    const x_m=P.lam*1e-9*P.D/(P.a*1e-3);   // fringe sep in metres on screen
+    const [R,G,B]=wl2rgb(P.lam);
+    // ---- apparatus sketch ----
+    const topH=150;
+    const slitX=Math.round(w*0.16), scrX=w-42;
+    ctx.strokeStyle=M;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(slitX,18);ctx.lineTo(slitX,topH-18);ctx.stroke();
+    const cy=topH/2;
+    const gapPix=Math.max(6,Math.min(46,P.a*34));
+    ctx.clearRect(slitX-4,cy-gapPix/2-2,8,4);
+    ctx.clearRect(slitX-4,cy+gapPix/2-2,8,4);
+    ctx.fillStyle='rgb('+R+','+G+','+B+')';
+    ctx.fillRect(slitX-3,cy-gapPix/2-2,6,4);
+    ctx.globalAlpha=P.b; ctx.fillRect(slitX-3,cy+gapPix/2-2,6,4); ctx.globalAlpha=1;
+    // rays
+    ctx.strokeStyle='rgb('+R+','+G+','+B+')';ctx.globalAlpha=.35;ctx.lineWidth=1;
+    for(let k=-3;k<=3;k++){
+      const ty=cy+k*(topH/2-24)/3;
+      ctx.beginPath();ctx.moveTo(slitX,cy-gapPix/2);ctx.lineTo(scrX,ty);ctx.stroke();
+      ctx.globalAlpha=.35*P.b;
+      ctx.beginPath();ctx.moveTo(slitX,cy+gapPix/2);ctx.lineTo(scrX,ty);ctx.stroke();
+      ctx.globalAlpha=.35;
+    }
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=M;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(scrX,14);ctx.lineTo(scrX,topH-14);ctx.stroke();
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+    ctx.fillText('double slit',slitX,topH+2);
+    ctx.fillText('screen',scrX-18,topH+2);
+    // a marker
+    ctx.strokeStyle=css('--amber');ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(slitX-16,cy-gapPix/2);ctx.lineTo(slitX-16,cy+gapPix/2);
+    ctx.moveTo(slitX-20,cy-gapPix/2);ctx.lineTo(slitX-12,cy-gapPix/2);
+    ctx.moveTo(slitX-20,cy+gapPix/2);ctx.lineTo(slitX-12,cy+gapPix/2);ctx.stroke();
+    ctx.fillStyle=css('--amber');ctx.textAlign='right';ctx.font='bold 11px ui-monospace,monospace';
+    ctx.fillText('a',slitX-24,cy+4);
+    // D marker
+    ctx.strokeStyle=M;ctx.globalAlpha=.7;ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(slitX,topH-6);ctx.lineTo(scrX,topH-6);ctx.stroke();ctx.globalAlpha=1;
+    ctx.fillStyle=M;ctx.textAlign='center';ctx.font='11px ui-monospace,monospace';
+    ctx.fillText('D = '+P.D.toFixed(1)+' m',(slitX+scrX)/2,topH-10);
+
+    // ---- fringe strip (real colours) ----
+    const stripY=topH+30, stripH=76;
+    const VIEW=0.024;                 // 24 mm of screen shown
+    const pxPerM=w/VIEW;
+    const A1=1, A2=P.b;
+    for(let i=0;i<w;i++){
+      const y=(i-w/2)/pxPerM;         // metres from centre
+      const phi=2*Math.PI*y/x_m;
+      const amp=Math.sqrt(A1*A1+A2*A2+2*A1*A2*Math.cos(phi));
+      const I=Math.pow(amp/2,2);
+      ctx.fillStyle='rgb('+Math.round(R*I)+','+Math.round(G*I)+','+Math.round(B*I)+')';
+      ctx.fillRect(i,stripY,1,stripH);
+    }
+    ctx.strokeStyle=L;ctx.lineWidth=1;ctx.strokeRect(0.5,stripY+.5,w-1,stripH-1);
+    // x marker on strip
+    const xp=x_m*pxPerM;
+    if(xp>14 && xp<w*0.8){
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.6;
+      const y0=stripY+stripH-14;
+      ctx.beginPath();ctx.moveTo(w/2,y0);ctx.lineTo(w/2+xp,y0);
+      ctx.moveTo(w/2,y0-5);ctx.lineTo(w/2,y0+5);
+      ctx.moveTo(w/2+xp,y0-5);ctx.lineTo(w/2+xp,y0+5);ctx.stroke();
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 11px ui-monospace,monospace';
+      ctx.fillText('x = '+(x_m*1000).toFixed(2)+' mm',w/2+xp/2,y0-9);
+    } else {
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='11px ui-monospace,monospace';
+      ctx.fillText('x = '+(x_m*1000).toFixed(2)+' mm',w/2,stripY+stripH-14);
+    }
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('what you SEE on the screen  (24 mm across)',2,stripY-6);
+
+    // ---- intensity graph ----
+    const gy=h-24, gh=h-24-(stripY+stripH+26);
+    ctx.strokeStyle=M;ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();
+    ctx.strokeStyle='rgb('+R+','+G+','+B+')';ctx.lineWidth=2.2;ctx.beginPath();
+    for(let i=0;i<=w;i++){
+      const y=(i-w/2)/pxPerM;
+      const phi=2*Math.PI*y/x_m;
+      const amp=Math.sqrt(A1*A1+A2*A2+2*A1*A2*Math.cos(phi));
+      const I=Math.pow(amp/2,2);
+      const yy=gy-I*gh;
+      i?ctx.lineTo(i,yy):ctx.moveTo(i,yy);
+    }
+    ctx.stroke();
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('intensity',2,gy-gh+10);
+  }
+  return {onInput,draw};
+});
+
+/* ===== 7. GRATING ===== */
+const grRoot=document.querySelector('[data-sim="grat"]');
+if(grRoot) reg(grRoot,(S)=>{
+  const P={N:500,lam:550}; let white=false;
+  function wl2rgb(nm){
+    let r=0,g=0,b=0;
+    if(nm<440){r=-(nm-440)/60;b=1;}
+    else if(nm<490){g=(nm-440)/50;b=1;}
+    else if(nm<510){g=1;b=-(nm-510)/20;}
+    else if(nm<580){r=(nm-510)/70;g=1;}
+    else if(nm<645){r=1;g=-(nm-645)/65;}
+    else {r=1;}
+    return 'rgb('+Math.round(255*Math.max(0,r))+','+Math.round(255*Math.max(0,g))+','+Math.round(255*Math.max(0,b))+')';
+  }
+  function upd(){
+    const d=1/(P.N*1000);
+    out(S.root,'N',P.N.toFixed(0)+' /mm');
+    out(S.root,'lam',P.lam.toFixed(0)+' nm');
+    const e=Math.floor(Math.log10(d));
+    out(S.root,'d',(d/Math.pow(10,e)).toFixed(2)+' × 10⁻'+String(-e).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('')+' m');
+    // sinθ = 1 exactly means θ = 90° — grazing along the grating, never seen — so that order drops out
+    let nmax=Math.floor(d/(P.lam*1e-9));
+    if(nmax*P.lam*1e-9/d>=1) nmax-=1;
+    out(S.root,'nmax',nmax);
+    out(S.root,'tot',2*nmax+1);
+    let s=[];
+    for(let n=1;n<=Math.min(nmax,4);n++){
+      s.push('θ'+n+' = '+(Math.asin(n*P.lam*1e-9/d)*180/Math.PI).toFixed(1)+'°');
+    }
+    out(S.root,'ang',s.join('   '));
+  }
+  function onInput(k,v){P[k]=v;upd();}
+  function onBtn(a,b){ if(a==='white'){white=!white;b.classList.toggle('on',white);} }
+  function draw(){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),L=css('--line');
+    const d=1/(P.N*1000);
+    const gx=Math.round(w*0.5), gy=h-52, RAD=Math.min(gx-30, gy-40);
+    // grating symbol
+    ctx.strokeStyle=M;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(gx-46,gy);ctx.lineTo(gx+46,gy);ctx.stroke();
+    ctx.lineWidth=1;
+    for(let i=-44;i<=44;i+=4){ctx.beginPath();ctx.moveTo(gx+i,gy-7);ctx.lineTo(gx+i,gy+7);ctx.stroke();}
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';
+    ctx.fillText('grating  ('+P.N.toFixed(0)+' lines/mm)',gx,gy+26);
+    // incoming
+    ctx.strokeStyle=white?'#ffffff':wl2rgb(P.lam);ctx.lineWidth=2.4;
+    ctx.beginPath();ctx.moveTo(gx,h-6);ctx.lineTo(gx,gy+8);ctx.stroke();
+    // normal
+    ctx.strokeStyle=M;ctx.setLineDash([4,4]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx,gy-RAD-16);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='right';
+    ctx.fillText('normal',gx-6,gy-RAD-8);   // left of the dashed line; n=0 label sits on the right
+    // arc
+    ctx.strokeStyle=L;ctx.lineWidth=1;ctx.beginPath();ctx.arc(gx,gy,RAD,Math.PI,2*Math.PI);ctx.stroke();
+
+    const set = white ? [430,480,530,580,630,680] : [P.lam];
+    const nmaxAll=Math.floor(d/(Math.min(...set)*1e-9));
+    for(let n=0;n<=nmaxAll;n++){
+      for(const lam of set){
+        const s=n*lam*1e-9/d;
+        if(s>=1) continue;              // s = 1 is θ = 90°, grazing — not an observable order
+        const th=Math.asin(s);
+        for(const sgn of (n===0?[1]:[1,-1])){
+          const ex=gx+RAD*Math.sin(sgn*th), ey=gy-RAD*Math.cos(th);
+          ctx.strokeStyle= (white&&n===0)?'#ffffff':wl2rgb(lam);
+          ctx.lineWidth= n===0?3:2.2;
+          ctx.globalAlpha= white?0.85:1;
+          ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(ex,ey);ctx.stroke();
+          ctx.globalAlpha=1;
+          if(lam===set[Math.floor(set.length/2)]||!white){
+            ctx.fillStyle=M;ctx.font='bold 11px ui-monospace,monospace';
+            ctx.textAlign= sgn>0?'left':'right';
+            const lx=gx+(RAD+8)*Math.sin(sgn*th), ly=gy-(RAD+8)*Math.cos(th);
+            ctx.fillText('n='+(sgn>0?n:'−'+n).toString().replace('−0','0'),lx+(sgn>0?4:-4),ly);
+          }
+        }
+      }
+    }
+    // theta arc for order 1
+    const s1=P.lam*1e-9/d;
+    if(!white && s1<=1){
+      const th=Math.asin(s1);
+      ctx.strokeStyle=css('--amber');ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.arc(gx,gy,54,-Math.PI/2,-Math.PI/2+th);ctx.stroke();
+      ctx.fillStyle=css('--amber');ctx.font='bold 12px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('θ',gx+22,gy-52);
+    }
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText(white?'WHITE LIGHT — zero order stays white; every other order spreads into a spectrum with RED furthest out'
+                     :'d sin θ = nλ  —  each order sits at its own angle',10,20);
+    if(white){
+      ctx.fillStyle=M;ctx.textAlign='right';
+      ctx.fillText('violet closest to the centre  ·  red furthest',w-10,20);
+    }
+  }
+  return {onInput,onBtn,draw};
+});
+
+})();
+</script>
+</body>
+</html>
