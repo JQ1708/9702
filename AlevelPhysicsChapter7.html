@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C7 Waves — See the Invisible | AS Physics 9702</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#151b23; --panel2:#1c242e; --line:#2a3440;
+  --ink:#e8eef5; --muted:#93a3b4; --dim:#6b7b8c;
+  --cyan:#4cc9f0; --violet:#b388ff; --pink:#ff6b9d; --lime:#8ce99a;
+  --amber:#ffd43b; --red:#ff8787;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#f6f8fb; --panel:#ffffff; --panel2:#eef2f7; --line:#d8e0ea;
+    --ink:#101720; --muted:#5a6b7c; --dim:#8494a4;
+    --cyan:#0e7490; --violet:#6d28d9; --pink:#be185d; --lime:#15803d;
+    --amber:#b45309; --red:#b91c1c; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"PingFang SC","Segoe UI",Roboto,sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px 100px}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .inner{max-width:1000px;margin:0 auto;padding:10px 18px;display:flex;gap:6px;
+  align-items:center;overflow-x:auto;scrollbar-width:none}
+nav .inner::-webkit-scrollbar{display:none}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:5px 10px;
+  border-radius:7px;white-space:nowrap;transition:.15s}
+nav a:hover{color:var(--ink);background:var(--panel2)}
+nav a.home{color:var(--cyan);font-weight:700}
+
+/* ---------- hero ---------- */
+header{padding:56px 0 34px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  color:var(--cyan);border:1px solid var(--cyan);padding:3px 10px;border-radius:20px;
+  text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(30px,6vw,50px);line-height:1.1;margin:0 0 14px;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--cyan)}
+.lede{color:var(--muted);font-size:17px;max-width:42em;margin:0}
+
+/* ---------- sections ---------- */
+section{margin:0 0 66px;scroll-margin-top:70px}
+h2{font-size:clamp(22px,4vw,30px);margin:0 0 6px;letter-spacing:-.01em;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 .num{font-family:var(--mono);font-size:14px;color:var(--cyan);opacity:.8}
+h3{font-size:17px;margin:30px 0 10px;color:var(--ink)}
+.sub{color:var(--muted);margin:0 0 22px;max-width:44em}
+p{max-width:44em}
+
+/* ---------- cards ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0}
+.def{background:var(--panel);border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;
+  padding:14px 18px;margin:16px 0}
+.def .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--cyan);
+  text-transform:uppercase;margin-bottom:4px}
+.def b{color:var(--ink)}
+.trap{background:color-mix(in srgb,var(--red) 10%,var(--panel));
+  border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0}
+.trap .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--red);
+  text-transform:uppercase;margin-bottom:4px}
+.exam{background:color-mix(in srgb,var(--amber) 10%,var(--panel));
+  border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0}
+.exam .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--amber);
+  text-transform:uppercase;margin-bottom:4px}
+.def p,.trap p,.exam p{margin:6px 0}
+.def p:last-child,.trap p:last-child,.exam p:last-child{margin-bottom:0}
+
+/* ---------- sim ---------- */
+.sim{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;margin:22px 0}
+.sim-head{padding:12px 18px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sim-head .name{font-weight:650;font-size:14px}
+.sim-head .hint{font-size:12px;color:var(--dim)}
+.sim canvas{display:block;width:100%;background:transparent;touch-action:none}
+.ctrls{padding:14px 18px;border-top:1px solid var(--line);background:var(--panel2);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px 22px}
+.ctrl label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);
+  margin-bottom:5px;font-family:var(--mono)}
+.ctrl label span{color:var(--cyan)}
+input[type=range]{width:100%;accent-color:var(--cyan);height:20px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line);
+  background:var(--panel2)}
+button{font:inherit;font-size:13px;padding:6px 14px;border-radius:8px;cursor:pointer;
+  background:var(--panel);color:var(--ink);border:1px solid var(--line);transition:.15s}
+button:hover{border-color:var(--cyan);color:var(--cyan)}
+button.on{background:var(--cyan);border-color:var(--cyan);color:#04121a;font-weight:650}
+.readout{padding:12px 18px;border-top:1px solid var(--line);font-family:var(--mono);
+  font-size:13px;display:flex;gap:20px;flex-wrap:wrap;background:var(--panel2)}
+.readout b{color:var(--cyan);font-weight:650}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);font-weight:600}
+tbody tr:hover{background:var(--panel2)}
+.eq{font-family:var(--mono);color:var(--violet);white-space:nowrap}
+
+/* ---------- misc ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+kbd{font-family:var(--mono);font-size:.88em;background:var(--panel2);border:1px solid var(--line);
+  padding:1px 6px;border-radius:5px}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px;
+  border:1px solid var(--line);color:var(--muted);margin:2px 4px 2px 0}
+.pill.hot{border-color:var(--red);color:var(--red)}
+.pill.warm{border-color:var(--amber);color:var(--amber)}
+ul,ol{max-width:44em;padding-left:22px}
+li{margin:5px 0}
+.foot{border-top:1px solid var(--line);padding-top:22px;color:var(--dim);font-size:13px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:12px 16px;margin:12px 0}
+summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--cyan)}
+details[open] summary{margin-bottom:8px}
+
+@media print{
+  body{background:#fff;color:#000}
+  nav,.ctrls,.btnrow,button{display:none!important}
+  .sim,.card,.def,.trap,.exam{break-inside:avoid;border-color:#bbb}
+  section{break-inside:auto}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="inner">
+  <a class="home" href="index.html">← Hub</a>
+  <a href="#anatomy">1 Anatomy</a>
+  <a href="#types">2 T vs L</a>
+  <a href="#phase">3 Phase</a>
+  <a href="#intensity">4 Intensity</a>
+  <a href="#cro">5 CRO</a>
+  <a href="#em">6 EM</a>
+  <a href="#doppler">7 Doppler</a>
+  <a href="#pol">8 Polarisation</a>
+  <a href="#radar">Exam Radar</a>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <div class="tag">CAIE 9702 · Chapter 7</div>
+  <h1>Waves — <em>seeing</em> the invisible</h1>
+  <p class="lede">A wave is energy moving through matter <b>without the matter moving along with it</b>.
+  Every single mark in this chapter comes from being able to picture that sentence.
+  Everything below moves — drag the sliders and watch what the equations actually mean.</p>
+</header>
+
+<!-- ============ 1 ANATOMY ============ -->
+<section id="anatomy">
+  <h2><span class="num">01</span> The two graphs that look identical (and aren't)</h2>
+  <p class="sub">This is the #1 mark-loser in the whole chapter. Both graphs are sine curves.
+  Both are labelled "displacement". But one has <b>distance</b> on the x-axis and the other has
+  <b>time</b>. Read λ off the wrong one and you lose every mark that follows.</p>
+
+  <div class="sim" data-sim="anatomy">
+    <div class="sim-head">
+      <span class="name">Wave anatomy — one wave, two graphs, live</span>
+      <span class="hint">the red dot is ONE particle</span>
+    </div>
+    <canvas height="440"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Amplitude A <span data-out="A">2.0 cm</span></label>
+        <input type="range" data-p="A" min="0.5" max="3" step="0.1" value="2"></div>
+      <div class="ctrl"><label>Wavelength λ <span data-out="lam">4.0 m</span></label>
+        <input type="range" data-p="lam" min="1.5" max="8" step="0.1" value="4"></div>
+      <div class="ctrl"><label>Frequency f <span data-out="f">0.50 Hz</span></label>
+        <input type="range" data-p="f" min="0.15" max="1.2" step="0.05" value="0.5"></div>
+      <div class="ctrl"><label>Watch the particle at x = <span data-out="x0">3.0 m</span></label>
+        <input type="range" data-p="x0" min="0" max="12" step="0.1" value="3"></div>
+    </div>
+    <div class="readout">
+      <span>v = fλ = <b data-out="v">2.00 m s⁻¹</b></span>
+      <span>T = 1/f = <b data-out="T">2.00 s</b></span>
+      <span>particle velocity right now: <b data-out="pv">—</b></span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Say it exactly like this</div>
+    <p><b>Displacement</b> — the distance <i>and direction</i> of a particle from its equilibrium position.
+    (<span style="color:var(--red)">"and direction"</span> is worth the mark.)</p>
+    <p><b>Amplitude</b> — the maximum displacement of a particle from its equilibrium position.</p>
+    <p><b>Wavelength</b> — the distance between two adjacent points on a wave that are <i>in phase</i>.</p>
+    <p><b>Period</b> — the time taken for one complete oscillation of a particle.</p>
+    <p><b>Frequency</b> — the number of complete oscillations per unit time.</p>
+    <p><b>Wavefront</b> — a line joining all points on a wave that are in phase.</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap</div>
+    <p>If the x-axis says <b>t / ms</b> you can only get <b>T</b> and hence <b>f</b> from it.
+    If it says <b>d / cm</b> you can only get <b>λ</b>. You need <i>both</i> graphs to get v = fλ —
+    which is exactly why the exam gives you two figures side by side.</p>
+    <p>Check the <b>prefix</b> before you divide. 0.225 ms is 2.25 × 10⁻⁴ s, not 2.25 × 10⁻³.
+    Wrong power of ten = wrong answer with correct working = 1 mark instead of 3.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">What they actually ask</div>
+    <p>"Use Fig. 4.1 and Fig. 4.2 to determine the amplitude, the wavelength, the frequency and
+    the speed." <span class="pill hot">appears in ~1 paper in 2</span></p>
+    <p>Order of attack: <b>A</b> from the height of either graph → <b>T</b> from the time graph →
+    <b>f = 1/T</b> → <b>λ</b> from the distance graph → <b>v = fλ</b>. Never guess the order.</p>
+  </div>
+</section>
+
+<!-- ============ 2 TRANSVERSE / LONGITUDINAL ============ -->
+<section id="types">
+  <h2><span class="num">02</span> Transverse vs longitudinal — the same graph, two meanings</h2>
+  <p class="sub">A longitudinal wave is drawn as a sine curve too. But that curve is <b>not</b> the shape
+  of anything. It is a bookkeeping graph: positive = particle pushed <b>right</b>, negative = particle
+  pushed <b>left</b>. Watch the dots and the curve at the same time until that clicks.</p>
+
+  <div class="sim" data-sim="tl">
+    <div class="sim-head">
+      <span class="name">Particles vs the graph</span>
+      <span class="hint">energy always travels →</span>
+    </div>
+    <canvas height="520"></canvas>
+    <div class="btnrow">
+      <button data-act="play" class="on">⏸ Pause</button>
+      <button data-act="graph" class="on">Displacement graph</button>
+      <button data-act="cr">C / R labels</button>
+      <button data-act="slow">Slow motion</button>
+    </div>
+    <div class="readout">
+      <span>Transverse: vibration <b>⊥</b> to energy transfer</span>
+      <span>Longitudinal: vibration <b>∥</b> to energy transfer</span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Mark-scheme wording</div>
+    <p><b>Transverse</b> — the vibrations of the particles are <i>perpendicular to</i> the direction of
+    energy transfer of the wave.</p>
+    <p><b>Longitudinal</b> — the vibrations of the particles are <i>parallel to</i> the direction of
+    energy transfer of the wave.</p>
+    <p><b>Compression</b> — region where particles move towards each other → <i>higher</i> pressure.<br>
+    <b>Rarefaction</b> — region where particles move away from each other → <i>lower</i> pressure.</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap — "sketch it later" vs "which way is it moving?"</div>
+    <p>These are <b>two different questions</b> and they need two different methods. Mixing them up
+    is the single commonest way to lose this mark.</p>
+    <p><b>(a) "Sketch the wave a quarter of a period later."</b> Shift the <i>whole curve</i>
+    <b>λ/4 in the direction of travel</b>. That is all. You are drawing a shape, not a particle.</p>
+    <p><b>(b) "State the direction of motion of particle Z at this instant."</b> Do <u>not</u> shift
+    the curve and read Z's new displacement — that gives you where Z <i>ends up</i>, not which way
+    it is going now. Use this rule instead:</p>
+    <p style="padding-left:14px;border-left:2px solid currentColor">
+    <b>A particle copies whatever the point just BEHIND it is doing now</b> — "behind" meaning the
+    side the wave came from. For a wave travelling <b>right</b>, look at the curve immediately to
+    the <b>left</b> of Z. If the curve there is <i>higher</i> than Z, then Z is moving <b>up</b>;
+    if <i>lower</i>, Z is moving <b>down</b>. Reverse it for a wave travelling left.</p>
+    <p>Check it against the shape: a particle sitting <b>at a crest or a trough is momentarily
+    stationary</b>, and a particle <b>at zero displacement is moving fastest</b>. If your answer
+    says a crest is moving, you have made a mistake.</p>
+    <p>For a <b>longitudinal</b> wave the graph's vertical axis is displacement <i>along</i> the
+    direction of travel, so "up" on the graph means the particle is displaced whichever way the
+    question defines as positive — <b>always read the sign convention the question states</b>
+    (usually "displacement to the right is positive"). The rule above is unchanged.</p>
+    <p>Never say "the wave moves the particle along". Particles only oscillate about a fixed
+    equilibrium position. <b>No net transfer of matter.</b></p>
+  </div>
+</section>
+
+<!-- ============ 3 PHASE ============ -->
+<section id="phase">
+  <h2><span class="num">03</span> Phase difference — it's just a fraction of a cycle × 360°</h2>
+  <p class="sub">One cycle ≡ one wavelength ≡ one period ≡ 360° ≡ 2π rad. That identity is the
+  whole topic. Everything else is measuring a gap and dividing.</p>
+
+  <div class="sim" data-sim="phase">
+    <div class="sim-head">
+      <span class="name">Two points on one wave · two waves at one point</span>
+      <span class="hint">switch mode below</span>
+    </div>
+    <canvas height="380"></canvas>
+    <div class="btnrow">
+      <button data-act="mode1" class="on">Two points on one wave</button>
+      <button data-act="mode2">Two whole waves</button>
+      <button data-act="anim">Animate</button>
+    </div>
+    <div class="ctrls">
+      <div class="ctrl"><label>Point P at x = <span data-out="p1">1.0 m</span></label>
+        <input type="range" data-p="p1" min="0" max="12" step="0.05" value="1"></div>
+      <div class="ctrl"><label>Point Q at x = <span data-out="p2">3.0 m</span></label>
+        <input type="range" data-p="p2" min="0" max="12" step="0.05" value="3"></div>
+      <div class="ctrl"><label>Wavelength λ <span data-out="lam">4.0 m</span></label>
+        <input type="range" data-p="lam" min="2" max="8" step="0.1" value="4"></div>
+    </div>
+    <div class="readout">
+      <span>separation Δx = <b data-out="dx">2.00 m</b></span>
+      <span>Δx / λ = <b data-out="frac">0.500</b></span>
+      <span>phase difference = <b data-out="phi">180°</b></span>
+      <span data-out="verdict" style="color:var(--pink)">antiphase</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>The only formula you need</b>
+    <p style="font-family:var(--mono);font-size:16px;color:var(--violet);margin:10px 0">
+      φ = (Δx / λ) × 360°   &nbsp;&nbsp;or&nbsp;&nbsp;  φ = (Δt / T) × 360°</p>
+    <p style="color:var(--muted);margin:0">Both are "how far apart, as a fraction of one whole cycle".
+    Same idea, different axis.</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Traps</div>
+    <p>Reducing the angle is <b>two</b> steps, and students usually only do the first.
+    <b>Step 1</b> — throw away whole turns: 1.25λ → 450°, and 450 − 360 = <b>90°</b>.
+    <b>Step 2</b> — if what is left is still more than 180°, take 360° minus it, because a lag of
+    270° and a lead of 90° are the same relationship: 0.75λ → 270° → you report <b>90°</b>.
+    So a phase difference, properly reduced, is never more than <b>180°</b>. That is the number
+    the simulation above prints — set Δx/λ to 0.750 and check it.</p>
+    <p>Points separated by a whole number of wavelengths are <b>in phase</b> (φ = 0). Points on
+    <i>opposite sides</i> of a single node/half-cycle are <b>180° out of phase</b>.</p>
+    <p>The exam sometimes asks for the unit — write the degree symbol, or state "rad" if you used π.
+    A bare number scores zero when the question says "include an appropriate unit".</p>
+  </div>
+</section>
+
+<!-- ============ 4 INTENSITY ============ -->
+<section id="intensity">
+  <h2><span class="num">04</span> Intensity ∝ amplitude²</h2>
+  <p class="sub">The single most tested proportionality in the chapter, and the one students square
+  the wrong way round.</p>
+
+  <div class="sim" data-sim="intensity">
+    <div class="sim-head"><span class="name">Amplitude ⇄ intensity</span>
+      <span class="hint">drag either slider</span></div>
+    <canvas height="300"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Amplitude (× original) <span data-out="ar">1.00</span></label>
+        <input type="range" data-p="ar" min="0.1" max="2" step="0.01" value="1"></div>
+    </div>
+    <div class="readout">
+      <span>A / A₀ = <b data-out="a2">1.00</b></span>
+      <span>I / I₀ = (A/A₀)² = <b data-out="i2">1.00</b></span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Definitions</div>
+    <p><b>Intensity</b> — the power incident on a surface per unit area. <span class="eq">I = P / A</span>, unit W m⁻².</p>
+    <p>For a progressive wave, <span class="eq">I ∝ amplitude²</span>.</p>
+    <p>For a point source spreading in 3D, <span class="eq">I ∝ 1 / r²</span> — so <span class="eq">amplitude ∝ 1 / r</span>.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">The four classic one-liners</div>
+    <table>
+      <thead><tr><th>Question</th><th>Answer</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Amplitude falls to half. New intensity?</td><td class="eq">I₀ / 4</td><td>(½)² </td></tr>
+        <tr><td>Intensity doubles. New amplitude?</td><td class="eq">√2 × A₀</td><td>A ∝ √I</td></tr>
+        <tr><td>Intensity ¼ of original. New amplitude on the CRO trace?</td><td class="eq">½ × A₀</td><td>√(¼)</td></tr>
+        <tr><td>Amplitudes 3.4 and 2.2 — ratio of intensities?</td><td class="eq">3.4² : 2.2² = 2.4 : 1</td><td>square <i>then</i> divide</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap</div>
+    <p>"Is the wave losing power as it moves away from the source?" — the answer is judged on
+    <b>amplitude decreasing with distance</b>, not on the wave "getting slower". Speed does not
+    change; amplitude does.</p>
+  </div>
+</section>
+
+<!-- ============ 5 CRO ============ -->
+<section id="cro">
+  <h2><span class="num">05</span> The CRO — a graph in disguise</h2>
+  <p class="sub">A cathode-ray oscilloscope screen is just a displacement–time graph where you are
+  told the scale in <b>seconds per centimetre</b> (time-base) and <b>volts per centimetre</b> (y-gain).
+  Count squares, multiply, done.</p>
+
+  <div class="sim" data-sim="cro">
+    <div class="sim-head"><span class="name">CRO reading drill</span>
+      <span class="hint">1 large square = 1.0 cm</span></div>
+    <canvas height="400"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Time-base <span data-out="tb">0.50 ms cm⁻¹</span></label>
+        <input type="range" data-p="tb" min="0" max="7" step="1" value="3"></div>
+      <div class="ctrl"><label>Y-gain <span data-out="yg">0.20 V cm⁻¹</span></label>
+        <input type="range" data-p="yg" min="0" max="5" step="1" value="2"></div>
+    </div>
+    <div class="btnrow">
+      <button data-act="new">↻ New signal</button>
+      <button data-act="reveal">Show answer</button>
+    </div>
+    <div class="readout"><span data-out="ans">Work out T, f and the amplitude, then check.</span></div>
+  </div>
+
+  <div class="card">
+    <b>Method (write it out every time — the working carries marks)</b>
+    <ol style="margin:8px 0 0">
+      <li>Count the horizontal length of <b>one complete wave</b> in cm.</li>
+      <li><span class="eq">T = (length in cm) × (time-base in s cm⁻¹)</span></li>
+      <li><span class="eq">f = 1 / T</span></li>
+      <li>Count from the centre line to a <b>peak</b> in cm (not peak-to-peak!).</li>
+      <li><span class="eq">amplitude = (height in cm) × (y-gain in V cm⁻¹)</span></li>
+    </ol>
+  </div>
+
+  <div class="trap">
+    <div class="t">Traps</div>
+    <p><b>Peak-to-peak is twice the amplitude.</b> The question almost always wants the amplitude.</p>
+    <p>Time-base is often in <b>µs cm⁻¹</b> or <b>ms cm⁻¹</b>. 250 µs cm⁻¹ = 2.5 × 10⁻⁴ s cm⁻¹.</p>
+    <p>The microphone converts sound into a varying voltage <i>of the same frequency</i>.
+    The CRO shows the <b>voltage</b>, not the pressure or displacement — but the frequency is identical.</p>
+  </div>
+</section>
+
+<!-- ============ 6 EM SPECTRUM ============ -->
+<section id="em">
+  <h2><span class="num">06</span> The electromagnetic spectrum</h2>
+  <p class="sub">Pure recall marks. Free marks. Learn the boundaries and you bank 3–5 marks a paper.</p>
+
+  <div class="sim" data-sim="em">
+    <div class="sim-head"><span class="name">Slide across the spectrum</span>
+      <span class="hint">log scale</span></div>
+    <canvas height="260"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Wavelength <span data-out="lam">500 nm</span></label>
+        <input type="range" data-p="k" min="0" max="1000" step="1" value="620"></div>
+    </div>
+    <div class="readout">
+      <span>region: <b data-out="reg">visible light</b></span>
+      <span>f = c/λ = <b data-out="f">6.0 × 10¹⁴ Hz</b></span>
+      <span data-out="use" style="color:var(--muted)">—</span>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Radiation</th><th>Wavelength range / m</th><th>Remember it as</th></tr></thead>
+    <tbody>
+      <tr><td>Radio waves</td><td class="eq">≥ 10⁰ (i.e. ≥ 1 m)</td><td>metres to kilometres</td></tr>
+      <tr><td>Microwaves</td><td class="eq">10⁻³ – 10⁻¹</td><td>centimetres</td></tr>
+      <tr><td>Infra-red</td><td class="eq">7 × 10⁻⁷ – 10⁻⁴</td><td>just past red</td></tr>
+      <tr><td>Visible light</td><td class="eq">4 × 10⁻⁷ – 7 × 10⁻⁷</td><td>400–700 nm</td></tr>
+      <tr><td>Ultra-violet</td><td class="eq">10⁻⁸ – 4 × 10⁻⁷</td><td>just past violet</td></tr>
+      <tr><td>X-rays</td><td class="eq">10⁻¹¹ – 10⁻⁹</td><td>atom-sized</td></tr>
+      <tr><td>Gamma rays</td><td class="eq">≤ 10⁻¹²</td><td>nucleus-sized</td></tr>
+    </tbody>
+  </table>
+
+  <div class="def">
+    <div class="t">"State three features common to all regions" — [3]</div>
+    <p>1. They are all <b>transverse</b> waves.<br>
+       2. They all travel at the <b>same speed 3.0 × 10⁸ m s⁻¹ in free space</b>.<br>
+       3. They can all travel through a <b>vacuum</b> (and can all be polarised).</p>
+    <p style="color:var(--muted)">If asked for a property <i>not</i> shared with other transverse waves:
+    <b>they can travel through a vacuum</b>.</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap</div>
+    <p>Ranges <b>overlap</b> in the real world; give a value safely inside a band. For X-rays say
+    1 × 10⁻¹⁰ m, for infra-red say 1 × 10⁻⁵ m. Don't sit on a boundary.</p>
+    <p>A block diagram labelled "wavelength <b>decreasing</b> →" runs radio → micro → IR → visible
+    → UV → X → gamma. Check the arrow direction before you name anything.</p>
+  </div>
+</section>
+
+<!-- ============ 7 DOPPLER ============ -->
+<section id="doppler">
+  <h2><span class="num">07</span> Doppler effect — the wavefronts bunch up</h2>
+  <p class="sub">The source keeps emitting at the same rate. But it chases the wavefronts it already
+  made, so ahead of it they crowd together (shorter λ → higher f) and behind it they stretch apart.
+  Watch the circles.</p>
+
+  <div class="sim" data-sim="doppler">
+    <div class="sim-head"><span class="name">Moving source, stationary observer</span>
+      <span class="hint">circles = wavefronts, each emitted one period apart</span></div>
+    <canvas height="420"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Source speed v<sub>s</sub> <span data-out="vs">60 m s⁻¹</span></label>
+        <input type="range" data-p="vs" min="-260" max="260" step="5" value="60"></div>
+      <div class="ctrl"><label>Source frequency f<sub>s</sub> <span data-out="fs">400 Hz</span></label>
+        <input type="range" data-p="fs" min="200" max="800" step="10" value="400"></div>
+    </div>
+    <div class="readout">
+      <span>v<sub>sound</sub> = <b>340 m s⁻¹</b></span>
+      <span>f<sub>o</sub> = f<sub>s</sub> · v/(v − v<sub>s</sub>) = <b data-out="fo">485 Hz</b></span>
+      <span data-out="dir" style="color:var(--lime)">moving towards → pitch rises</span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Definition and formula</div>
+    <p><b>Doppler effect</b> — the change in the observed frequency when there is relative motion
+    between a source and an observer.</p>
+    <p style="font-family:var(--mono);font-size:16px;color:var(--violet)">f<sub>o</sub> = f<sub>s</sub> × v / (v ± v<sub>s</sub>)</p>
+    <p><b>−</b> when the source moves <b>towards</b> the observer (denominator smaller → f<sub>o</sub> larger).<br>
+       <b>+</b> when the source moves <b>away</b> (denominator larger → f<sub>o</sub> smaller).</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">The circular-track question <span class="pill warm">recurring</span></div>
+    <p>A car circles a track sounding a 1.2 kHz horn; an observer stands far away. The graph of
+    f against time oscillates between about 1.4 kHz and 1.05 kHz.</p>
+    <ul>
+      <li><b>Maximum f</b> — car at the point where it moves <b>directly towards</b> the observer
+      (full v<sub>s</sub> along the line of sight).</li>
+      <li><b>Minimum f</b> — directly <b>away</b>.</li>
+      <li><b>f = f<sub>s</sub> exactly (1.2 kHz)</b> — the two points where the car moves
+      <b>perpendicular</b> to the line of sight: v<sub>s</sub> along the line of sight is zero.</li>
+      <li>To find the car's speed, use the <b>maximum</b> (or minimum) frequency, where the whole
+      speed is along the line of sight.</li>
+    </ul>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap</div>
+    <p>The syllabus formula only handles a <b>moving source</b>. If the observer moves instead,
+    you're outside the AS formula — the exam won't ask for a number, only a direction of change.</p>
+    <p>The wave <b>speed does not change</b>. What changes is the wavelength in front of / behind
+    the source, and therefore the frequency detected.</p>
+  </div>
+</section>
+
+<!-- ============ 8 POLARISATION ============ -->
+<section id="pol">
+  <h2><span class="num">08</span> Polarisation and Malus's law</h2>
+  <p class="sub">Unpolarised light vibrates in every plane perpendicular to travel. A polarising
+  filter throws away everything except the component along its transmission axis. Rotate the
+  second filter and watch the cos² curve draw itself.</p>
+
+  <div class="sim" data-sim="pol">
+    <div class="sim-head"><span class="name">Two filters + intensity meter</span>
+      <span class="hint">drag θ and watch the graph build</span></div>
+    <canvas height="470"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Analyser angle θ from the first filter's axis <span data-out="th">0°</span></label>
+        <input type="range" data-p="th" min="0" max="360" step="1" value="0"></div>
+      <div class="ctrl"><label>Incident (unpolarised) intensity <span data-out="i0">8.0 W m⁻²</span></label>
+        <input type="range" data-p="i0" min="1" max="12" step="0.5" value="8"></div>
+    </div>
+    <div class="readout">
+      <span>after filter 1: <b data-out="i1">4.0 W m⁻²</b> (= ½ I<sub>unpol</sub>)</span>
+      <span>after filter 2: I₁cos²θ = <b data-out="i2">4.0 W m⁻²</b></span>
+    </div>
+  </div>
+
+  <div class="def">
+    <div class="t">Definitions</div>
+    <p><b>Plane-polarised</b> — the oscillations of the wave are in <b>one plane only</b>, which
+    contains the direction of propagation (i.e. the vibration is restricted to a single direction
+    perpendicular to the direction of travel).</p>
+    <p><b>Polarisation</b> — the process of restricting the oscillations of a wave to a single plane
+    perpendicular to the direction of propagation.</p>
+    <p><b>Malus's law</b>: <span class="eq">I = I₀ cos²θ</span>, where θ is the angle between the plane of
+    the incident polarised wave and the transmission axis of the filter.</p>
+  </div>
+
+  <div class="exam">
+    <div class="t">Two questions that come up again and again</div>
+    <p><b>"Why can light be polarised but sound cannot?"</b><br>
+    Light is a <b>transverse</b> wave, so its vibrations occur in many planes perpendicular to the
+    direction of travel and can be restricted to one. Sound is <b>longitudinal</b> — the vibration is
+    already along the direction of travel, so there are no sideways planes to select from.
+    <b>Only transverse waves can be polarised.</b></p>
+    <p><b>"Sketch I against angle as the filter is rotated through 360°"</b><br>
+    Starting from a maximum: maxima at 0°, 180°, 360°; <b>zeros</b> at 90° and 270°.
+    Two full humps. Curve must <b>never go negative</b> and must touch zero (not just dip).</p>
+  </div>
+
+  <div class="trap">
+    <div class="t">Trap — the chained-filter angle</div>
+    <p>θ in Malus's law is measured between the light's plane of polarisation and the
+    <b>next</b> filter's axis — <i>not</i> from the vertical.</p>
+    <p>Worked example: filter 1 axis at 35° to vertical, vertically polarised light of 8.5 W m⁻² in.<br>
+    After filter 1: I₁ = 8.5 cos²(35°) = <b>5.7 W m⁻²</b>, and the light is now polarised <b>at 35°</b>.<br>
+    Filter 2 gives 5.2 W m⁻²: cos²θ = 5.2/5.7 → θ = 17.2° <b>from filter 1's axis</b>.<br>
+    So α = 35° + 17.2° = <b>52.2°</b> from the vertical. Missing that last addition is the classic drop.</p>
+    <p>Unpolarised light through the <b>first</b> filter always loses exactly <b>half</b> its intensity,
+    whatever the angle. Malus's law does not apply to that first step.</p>
+  </div>
+</section>
+
+<!-- ============ EXAM RADAR ============ -->
+<section id="radar">
+  <h2><span class="num">★</span> Exam radar — where the marks actually are</h2>
+  <p class="sub">Built from the 21 structured questions in your P7 pack (2003–2023 CAIE 9702).</p>
+
+  <table>
+    <thead><tr><th>Skill</th><th>How often</th><th>Typical mark tariff</th></tr></thead>
+    <tbody>
+      <tr><td>Read A, λ, T, f, v off displacement graphs</td><td><span class="pill hot">very high</span></td><td>4–6</td></tr>
+      <tr><td>Definitions (displacement / amplitude / wavelength / frequency / period)</td><td><span class="pill hot">very high</span></td><td>1–2 each</td></tr>
+      <tr><td>Phase difference between two points or two waves</td><td><span class="pill hot">very high</span></td><td>1–2</td></tr>
+      <tr><td>Intensity ∝ A² (ratios both directions)</td><td><span class="pill hot">very high</span></td><td>2–3</td></tr>
+      <tr><td>Transverse vs longitudinal — "state and explain"</td><td><span class="pill warm">high</span></td><td>1–2</td></tr>
+      <tr><td>CRO: time-base / y-gain → f and amplitude</td><td><span class="pill warm">high</span></td><td>2–4</td></tr>
+      <tr><td>Malus's law calculation (often two filters)</td><td><span class="pill warm">high</span></td><td>2–3</td></tr>
+      <tr><td>Doppler: describe + calculate v or f<sub>o</sub></td><td><span class="pill warm">high</span></td><td>3–4</td></tr>
+      <tr><td>EM spectrum: features, order, typical wavelengths</td><td><span class="pill warm">high</span></td><td>2–3</td></tr>
+      <tr><td>Progressive vs stationary — early "state and explain" part</td><td>medium</td><td>1–2</td></tr>
+      <tr><td>Describe a ripple tank / sketch the set-up</td><td>low</td><td>2</td></tr>
+      <tr><td>Draw a second wave (half frequency / 180° out of phase / double intensity)</td><td>medium</td><td>1–2</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The drawing questions — a checklist that scores full marks</h3>
+  <div class="card">
+    <p><b>"Draw a second wave with the same amplitude but half the frequency"</b> → same height,
+    <b>twice</b> the wavelength on a distance axis (or twice the period on a time axis). Keep it
+    starting at the same point.</p>
+    <p><b>"Draw a wave with double the intensity, 180° out of phase"</b> → amplitude × √2, and
+    inverted (peaks where the original has troughs).</p>
+    <p><b>"Sketch the wave 0.25 T later"</b> → shift the whole curve <b>a quarter of a wavelength in
+    the direction of travel</b>. Do not change its shape, height or wavelength.</p>
+    <p><b>"Sketch the CRO trace when the intensity is quartered"</b> → the trace height halves
+    (√¼ = ½). The <b>horizontal spacing does not change</b> — the CRO's x-axis is <i>time</i>, so
+    what you see repeating across the screen is the <b>period</b>, not the wavelength, and the
+    frequency is unchanged.</p>
+  </div>
+
+  <details>
+    <summary>Instant-recall sheet (print this)</summary>
+    <table>
+      <tbody>
+        <tr><td>Wave speed</td><td class="eq">v = fλ = λ/T</td></tr>
+        <tr><td>Frequency</td><td class="eq">f = 1/T</td></tr>
+        <tr><td>Phase difference</td><td class="eq">φ = (Δx/λ) × 360° = (Δt/T) × 360°</td></tr>
+        <tr><td>Intensity</td><td class="eq">I = P/A ;  I ∝ A² ;  I ∝ 1/r²</td></tr>
+        <tr><td>CRO period</td><td class="eq">T = (cm per cycle) × (time-base)</td></tr>
+        <tr><td>CRO amplitude</td><td class="eq">V = (cm from centre to peak) × (y-gain)</td></tr>
+        <tr><td>Speed of EM waves in vacuum</td><td class="eq">c = 3.0 × 10⁸ m s⁻¹</td></tr>
+        <tr><td>Doppler</td><td class="eq">f<sub>o</sub> = f<sub>s</sub> v / (v ± v<sub>s</sub>)  (− towards, + away)</td></tr>
+        <tr><td>Malus</td><td class="eq">I = I₀ cos²θ  (and unpolarised → ½ I after first filter)</td></tr>
+      </tbody>
+    </table>
+  </details>
+</section>
+
+<div class="foot">
+  AS Physics 9702 · Chapter 7 · interactive notes.
+  <a href="index.html" style="color:var(--cyan)">← back to the hub</a> ·
+  <a href="C8-Superposition.html" style="color:var(--cyan)">Chapter 8: Superposition →</a>
+</div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- tiny canvas framework ---------- */
+const sims=[];
+function fit(cv){
+  const dpr=window.devicePixelRatio||1;
+  // NOTE: assigning cv.height reflects back into the height attribute, so the
+  // design height must be cached on first fit — re-reading it would multiply by
+  // dpr on every ResizeObserver tick and blow the canvas up to millions of px.
+  if(!cv.dataset.baseh) cv.dataset.baseh=parseInt(cv.getAttribute('height'),10)||400;
+  const w=cv.clientWidth, h=parseInt(cv.dataset.baseh,10);
+  cv.style.height=h+'px';
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w,h};
+}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function reg(root,init){
+  const cv=root.querySelector('canvas');
+  const state={root,cv,vis:true};
+  const api=init(state);
+  state.api=api;
+  const relayout=()=>{const g=fit(cv);state.ctx=g.ctx;state.w=g.w;state.h=g.h;};
+  relayout(); state.relayout=relayout;
+  new ResizeObserver(()=>{relayout(); if(api.draw)api.draw(state.t||0);}).observe(cv);
+  new IntersectionObserver(es=>{state.vis=es[0].isIntersecting;},{threshold:0}).observe(cv);
+  sims.push(state);
+  // controls
+  root.querySelectorAll('input[type=range]').forEach(inp=>{
+    const f=()=>{ if(api.onInput)api.onInput(inp.dataset.p, parseFloat(inp.value)); };
+    inp.addEventListener('input',f); f();
+  });
+  root.querySelectorAll('button[data-act]').forEach(b=>{
+    b.addEventListener('click',()=>{ if(api.onBtn)api.onBtn(b.dataset.act,b); });
+  });
+  return state;
+}
+function out(root,key,val){const e=root.querySelector('[data-out="'+key+'"]'); if(e)e.textContent=val;}
+
+let t0=performance.now();
+function loop(now){
+  const t=(now-t0)/1000;
+  for(const s of sims){ s.t=t; if(s.vis && s.api.draw) s.api.draw(t); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* generic grid helper */
+function grid(ctx,x,y,w,h,step,col){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1;ctx.globalAlpha=.5;ctx.beginPath();
+  for(let gx=x;gx<=x+w+.5;gx+=step){ctx.moveTo(Math.round(gx)+.5,y);ctx.lineTo(Math.round(gx)+.5,y+h);}
+  for(let gy=y;gy<=y+h+.5;gy+=step){ctx.moveTo(x,Math.round(gy)+.5);ctx.lineTo(x+w,Math.round(gy)+.5);}
+  ctx.stroke();ctx.restore();
+}
+function axis(ctx,x,y,w,col,label){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();
+  ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();
+  if(label){ctx.fillStyle=col;ctx.font='11px ui-monospace,monospace';ctx.textAlign='right';
+    ctx.fillText(label,x+w,y-7);}
+  ctx.restore();
+}
+
+/* ============ 1. ANATOMY ============ */
+const anaRoot=document.querySelector('[data-sim="anatomy"]');
+if(anaRoot) reg(anaRoot,(S)=>{
+  const P={A:2,lam:4,f:.5,x0:3};
+  const XMAX=12, hist=[];
+  function onInput(k,v){
+    P[k]=v;
+    out(S.root,'A',P.A.toFixed(1)+' cm');
+    out(S.root,'lam',P.lam.toFixed(1)+' m');
+    out(S.root,'f',P.f.toFixed(2)+' Hz');
+    out(S.root,'x0',P.x0.toFixed(1)+' m');
+    out(S.root,'v',(P.f*P.lam).toFixed(2)+' m s⁻¹');
+    out(S.root,'T',(1/P.f).toFixed(2)+' s');
+    if(k!=='x0') hist.length=0;
+  }
+  function y(x,t){ return P.A*Math.sin(2*Math.PI*(x/P.lam - P.f*t)); }
+  function draw(t){
+    const {ctx,w,h}=S; ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--cyan'),V=css('--violet'),PK=css('--pink'),I=css('--ink');
+    const padL=52,padR=18;
+    const gw=w-padL-padR;
+    const topY=64, botY=h-96, gh=118;
+
+    // ---- TOP: y vs x ----
+    ctx.fillStyle=M; ctx.font='12px ui-monospace,monospace'; ctx.textAlign='left';
+    ctx.fillText('SNAPSHOT  —  displacement vs DISTANCE  (gives you λ)',padL,26);
+    grid(ctx,padL,topY-gh/2,gw,gh,gw/24,L);
+    axis(ctx,padL,topY,gw,M,'x / m');
+    ctx.strokeStyle=C;ctx.lineWidth=2.4;ctx.beginPath();
+    for(let i=0;i<=gw;i++){const x=i/gw*XMAX; const yy=topY-y(x,t)/3*gh/2*1.0;
+      i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+    ctx.stroke();
+    // lambda marker
+    const px=(x)=>padL+x/XMAX*gw;
+    const l0=0.25*P.lam;
+    ctx.strokeStyle=V;ctx.lineWidth=1.4;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(px(l0),topY-gh/2);ctx.lineTo(px(l0),topY+gh/2);
+    ctx.moveTo(px(l0+P.lam),topY-gh/2);ctx.lineTo(px(l0+P.lam),topY+gh/2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(px(l0),topY-gh/2+9);ctx.lineTo(px(l0+P.lam),topY-gh/2+9);ctx.stroke();
+    ctx.fillStyle=V;ctx.textAlign='center';ctx.font='bold 12px ui-monospace,monospace';
+    ctx.fillText('λ = '+P.lam.toFixed(1)+' m',(px(l0)+px(l0+P.lam))/2,topY-gh/2+3);
+    // particle
+    const yp=y(P.x0,t);
+    ctx.fillStyle=PK;ctx.beginPath();ctx.arc(px(P.x0),topY-yp/3*gh/2,6,0,7);ctx.fill();
+    ctx.strokeStyle=PK;ctx.lineWidth=1;ctx.setLineDash([2,3]);
+    ctx.beginPath();ctx.moveTo(px(P.x0),topY-gh/2);ctx.lineTo(px(P.x0),topY+gh/2);ctx.stroke();
+    ctx.setLineDash([]);
+    // arrow for particle motion (transverse: vertical)
+    const vy=-2*Math.PI*P.f*P.A*Math.cos(2*Math.PI*(P.x0/P.lam-P.f*t));
+    const dir=vy>0?-1:1;
+    ctx.strokeStyle=PK;ctx.lineWidth=2;ctx.beginPath();
+    const ay=topY-yp/3*gh/2;
+    ctx.moveTo(px(P.x0)+16,ay);ctx.lineTo(px(P.x0)+16,ay+dir*18);
+    ctx.lineTo(px(P.x0)+12,ay+dir*13);ctx.moveTo(px(P.x0)+16,ay+dir*18);ctx.lineTo(px(P.x0)+20,ay+dir*13);
+    ctx.stroke();
+    out(S.root,'pv',(dir<0?'moving UP':'moving DOWN'));
+    // wave travel arrow
+    ctx.fillStyle=C;ctx.textAlign='right';ctx.font='11px ui-monospace,monospace';
+    ctx.fillText('wave travels →',padL+gw,topY+gh/2+18);
+
+    // ---- BOTTOM: y vs t for that particle ----
+    ctx.fillStyle=M;ctx.textAlign='left';ctx.font='12px ui-monospace,monospace';
+    ctx.fillText('ONE PARTICLE  —  displacement vs TIME  (gives you T)',padL,botY-gh/2-16);
+    grid(ctx,padL,botY-gh/2,gw,gh,gw/24,L);
+    axis(ctx,padL,botY,gw,M,'t / s');
+    const TWIN=8; // seconds shown
+    ctx.strokeStyle=PK;ctx.lineWidth=2.4;ctx.beginPath();
+    for(let i=0;i<=gw;i++){
+      const tt=t-TWIN+ i/gw*TWIN;
+      const yy=botY-y(P.x0,tt)/3*gh/2;
+      i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);
+    }
+    ctx.stroke();
+    ctx.fillStyle=PK;ctx.beginPath();ctx.arc(padL+gw,botY-yp/3*gh/2,6,0,7);ctx.fill();
+    // T marker
+    const T=1/P.f;
+    if(T<TWIN*.9){
+      const x1=padL+gw-T/TWIN*gw, x2=padL+gw;
+      ctx.strokeStyle=V;ctx.lineWidth=1.4;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(x1,botY-gh/2);ctx.lineTo(x1,botY+gh/2);
+      ctx.moveTo(x2,botY-gh/2);ctx.lineTo(x2,botY+gh/2);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.moveTo(x1,botY+gh/2-9);ctx.lineTo(x2,botY+gh/2-9);ctx.stroke();
+      ctx.fillStyle=V;ctx.textAlign='center';ctx.font='bold 12px ui-monospace,monospace';
+      ctx.fillText('T = '+T.toFixed(2)+' s',(x1+x2)/2,botY+gh/2+6);
+    }
+    // amplitude marker on top graph
+    ctx.strokeStyle=css('--lime');ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(padL-14,topY);ctx.lineTo(padL-14,topY-P.A/3*gh/2);ctx.stroke();
+    ctx.fillStyle=css('--lime');ctx.save();ctx.translate(padL-22,topY-P.A/6*gh/2);ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center';ctx.font='bold 11px ui-monospace,monospace';ctx.fillText('A',0,0);ctx.restore();
+  }
+  return {onInput,draw};
+});
+
+/* ============ 2. TRANSVERSE / LONGITUDINAL ============ */
+const tlRoot=document.querySelector('[data-sim="tl"]');
+if(tlRoot) reg(tlRoot,(S)=>{
+  let playing=true, showGraph=true, showCR=false, slow=false, phase=0, last=null;
+  function onBtn(a,b){
+    if(a==='play'){playing=!playing;b.classList.toggle('on',playing);b.textContent=playing?'⏸ Pause':'▶ Play';}
+    if(a==='graph'){showGraph=!showGraph;b.classList.toggle('on',showGraph);}
+    if(a==='cr'){showCR=!showCR;b.classList.toggle('on',showCR);}
+    if(a==='slow'){slow=!slow;b.classList.toggle('on',slow);}
+  }
+  function draw(t){
+    if(last===null)last=t;
+    const dt=t-last; last=t;
+    if(playing) phase += dt*(slow?0.18:0.6);
+    const {ctx,w,h}=S; ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--cyan'),PK=css('--pink'),V=css('--violet'),
+          I=css('--ink'),LI=css('--lime'),R=css('--red');
+    const padL=20,padR=20,gw=w-padL-padR;
+    const N=44, lam=gw/2.2;
+
+    // ------- TRANSVERSE -------
+    let cy=78;
+    ctx.fillStyle=M;ctx.font='12px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('TRANSVERSE  —  particles bob ⊥ to the energy',padL,26);
+    ctx.strokeStyle=L;ctx.lineWidth=1;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(padL,cy);ctx.lineTo(padL+gw,cy);ctx.stroke();ctx.setLineDash([]);
+    // connecting curve
+    ctx.strokeStyle=C;ctx.globalAlpha=.35;ctx.lineWidth=2;ctx.beginPath();
+    for(let i=0;i<=gw;i++){const yy=cy-30*Math.sin(2*Math.PI*(i/lam-phase));i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+    ctx.stroke();ctx.globalAlpha=1;
+    for(let i=0;i<N;i++){
+      const x=padL+i*gw/(N-1);
+      const yy=cy-30*Math.sin(2*Math.PI*((x-padL)/lam-phase));
+      ctx.fillStyle= (i===12)?PK:C;
+      ctx.beginPath();ctx.arc(x,yy,(i===12)?6:3.6,0,7);ctx.fill();
+    }
+    // highlighted particle path
+    ctx.strokeStyle=PK;ctx.lineWidth=1;ctx.setLineDash([2,3]);
+    const hx=padL+12*gw/(N-1);
+    ctx.beginPath();ctx.moveTo(hx,cy-32);ctx.lineTo(hx,cy+32);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='right';
+    ctx.fillText('energy →',padL+gw,cy+52);
+
+    // ------- LONGITUDINAL -------
+    cy=200;
+    ctx.fillStyle=M;ctx.font='12px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('LONGITUDINAL  —  same particles, pushed ∥ to the energy',padL,cy-42);
+    const AMPX=gw/N*1.6;
+    const px0=[];
+    for(let i=0;i<N*2;i++){
+      const x0=padL+i*gw/(N*2-1);
+      const d=AMPX*Math.sin(2*Math.PI*((x0-padL)/lam-phase));
+      px0.push({x0,x:x0+d,d});
+    }
+    for(const p of px0){
+      ctx.fillStyle= C; ctx.globalAlpha=.9;
+      ctx.beginPath();ctx.arc(p.x,cy,3.2,0,7);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    // marked particle
+    const mp=px0[24];
+    ctx.fillStyle=PK;ctx.beginPath();ctx.arc(mp.x,cy,6,0,7);ctx.fill();
+    ctx.strokeStyle=PK;ctx.lineWidth=1;ctx.setLineDash([2,3]);
+    ctx.beginPath();ctx.moveTo(mp.x0,cy-24);ctx.lineTo(mp.x0,cy+24);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=PK;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+    ctx.fillText('equilibrium',mp.x0,cy-30);
+    if(showCR){
+      // compressions where dd/dx < 0 -> find minima of displacement gradient
+      for(let k=-1;k<6;k++){
+        // compression centres where sin gradient most negative: (x/lam - phase) = 0.5 -> ...
+        const xc=padL+lam*(0.5+k+phase%1);
+        const xr=padL+lam*(0.0+k+phase%1);
+        if(xc>padL&&xc<padL+gw){ctx.fillStyle=R;ctx.font='bold 12px ui-monospace,monospace';
+          ctx.fillText('C',xc,cy+40);}
+        if(xr>padL&&xr<padL+gw){ctx.fillStyle=LI;ctx.font='bold 12px ui-monospace,monospace';
+          ctx.fillText('R',xr,cy+40);}
+      }
+      ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('C = compression (high pressure)   R = rarefaction (low pressure)',padL,cy+58);
+    }
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='right';
+    ctx.fillText('energy →',padL+gw,cy-24);
+
+    // ------- graph -------
+    if(showGraph){
+      const gy=380, gh=110;
+      ctx.fillStyle=M;ctx.font='12px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('…and the displacement–distance graph of THAT longitudinal wave',padL,gy-gh/2-16);
+      grid(ctx,padL,gy-gh/2,gw,gh,gw/24,L);
+      axis(ctx,padL,gy,gw,M,'x');
+      ctx.strokeStyle=V;ctx.lineWidth=2.4;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const yy=gy-(gh/2-8)*Math.sin(2*Math.PI*(i/lam-phase));
+        i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+      ctx.fillStyle=V;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('+ve  =  particle displaced to the RIGHT',padL+6,gy-gh/2+14);
+      ctx.fillText('−ve  =  particle displaced to the LEFT',padL+6,gy+gh/2-6);
+      // link marked particle
+      const gx=mp.x0;
+      ctx.strokeStyle=PK;ctx.lineWidth=1.2;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(gx,cy+14);ctx.lineTo(gx,gy-(gh/2-8)*Math.sin(2*Math.PI*((gx-padL)/lam-phase)));
+      ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=PK;ctx.beginPath();
+      ctx.arc(gx,gy-(gh/2-8)*Math.sin(2*Math.PI*((gx-padL)/lam-phase)),5,0,7);ctx.fill();
+    }
+  }
+  return {onBtn,draw};
+});
+
+/* ============ 3. PHASE ============ */
+const phRoot=document.querySelector('[data-sim="phase"]');
+if(phRoot) reg(phRoot,(S)=>{
+  const P={p1:1,p2:3,lam:4};
+  let mode=1, anim=false, ph=0, last=null;
+  function upd(){
+    out(S.root,'p1',P.p1.toFixed(1)+' m');
+    out(S.root,'p2',P.p2.toFixed(1)+' m');
+    out(S.root,'lam',P.lam.toFixed(1)+' m');
+    const dx=Math.abs(P.p2-P.p1);
+    let fr=dx/P.lam;
+    let deg=(fr*360)%360; if(deg>180) deg=360-deg;
+    out(S.root,'dx',dx.toFixed(2)+' m');
+    out(S.root,'frac',(dx/P.lam).toFixed(3));
+    out(S.root,'phi',deg.toFixed(0)+'°');
+    let v='';
+    if(deg<3) v='IN PHASE  (Δx = whole number of λ)';
+    else if(Math.abs(deg-180)<3) v='ANTIPHASE  (Δx = odd number of half-λ)';
+    else v=deg.toFixed(0)+'° out of phase';
+    out(S.root,'verdict',v);
+  }
+  function onInput(k,v){P[k]=v;upd();}
+  function onBtn(a,b){
+    if(a==='mode1'||a==='mode2'){
+      mode=(a==='mode1')?1:2;
+      S.root.querySelectorAll('button[data-act^=mode]').forEach(x=>x.classList.toggle('on',x.dataset.act===a));
+    }
+    if(a==='anim'){anim=!anim;b.classList.toggle('on',anim);}
+  }
+  function draw(t){
+    if(last===null)last=t; const dt=t-last; last=t; if(anim) ph+=dt*0.25;
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--cyan'),PK=css('--pink'),V=css('--violet');
+    const padL=40,padR=20,gw=w-padL-padR,cy=h/2+10,gh=180;
+    const XMAX=12, px=x=>padL+x/XMAX*gw;
+    grid(ctx,padL,cy-gh/2,gw,gh,gw/24,L);
+    axis(ctx,padL,cy,gw,M,'x / m');
+    const dx=Math.abs(P.p2-P.p1);
+    if(mode===1){
+      ctx.fillStyle=M;ctx.font='12px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('One wave. How far apart are P and Q, as a fraction of λ?',padL,26);
+      ctx.strokeStyle=C;ctx.lineWidth=2.4;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const x=i/gw*XMAX;
+        const yy=cy-(gh/2-14)*Math.sin(2*Math.PI*(x/P.lam-ph));
+        i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+      [[P.p1,'P',PK],[P.p2,'Q',V]].forEach(([x,lab,col])=>{
+        const yy=cy-(gh/2-14)*Math.sin(2*Math.PI*(x/P.lam-ph));
+        ctx.strokeStyle=col;ctx.lineWidth=1;ctx.setLineDash([2,3]);
+        ctx.beginPath();ctx.moveTo(px(x),cy-gh/2);ctx.lineTo(px(x),cy+gh/2);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle=col;ctx.beginPath();ctx.arc(px(x),yy,6,0,7);ctx.fill();
+        ctx.font='bold 13px ui-monospace,monospace';ctx.textAlign='center';
+        ctx.fillText(lab,px(x),cy-gh/2-6);
+      });
+      // separation bracket
+      const a=px(Math.min(P.p1,P.p2)),b=px(Math.max(P.p1,P.p2));
+      ctx.strokeStyle=css('--lime');ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.moveTo(a,cy+gh/2+16);ctx.lineTo(b,cy+gh/2+16);
+      ctx.moveTo(a,cy+gh/2+11);ctx.lineTo(a,cy+gh/2+21);
+      ctx.moveTo(b,cy+gh/2+11);ctx.lineTo(b,cy+gh/2+21);ctx.stroke();
+      ctx.fillStyle=css('--lime');ctx.textAlign='center';ctx.font='bold 12px ui-monospace,monospace';
+      ctx.fillText('Δx = '+dx.toFixed(2)+' m = '+(dx/P.lam).toFixed(2)+' λ',(a+b)/2,cy+gh/2+34);
+    } else {
+      ctx.fillStyle=M;ctx.font='12px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('Two waves, shifted by Δx. Same maths.',padL,26);
+      const shift=P.p2-P.p1;
+      ctx.strokeStyle=C;ctx.lineWidth=2.4;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const x=i/gw*XMAX;
+        const yy=cy-(gh/2-14)*Math.sin(2*Math.PI*(x/P.lam-ph));
+        i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+      ctx.strokeStyle=V;ctx.lineWidth=2.4;ctx.beginPath();
+      for(let i=0;i<=gw;i++){const x=i/gw*XMAX;
+        const yy=cy-(gh/2-14)*0.75*Math.sin(2*Math.PI*((x-shift)/P.lam-ph));
+        i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+      ctx.stroke();
+      ctx.fillStyle=C;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+      ctx.fillText('wave 1',padL+6,cy-gh/2+14);
+      ctx.fillStyle=V;ctx.fillText('wave 2  (shifted '+shift.toFixed(2)+' m)',padL+6,cy-gh/2+30);
+    }
+    upd();
+  }
+  return {onInput,onBtn,draw};
+});
+
+/* ============ 4. INTENSITY ============ */
+const inRoot=document.querySelector('[data-sim="intensity"]');
+if(inRoot) reg(inRoot,(S)=>{
+  const P={ar:1};
+  function onInput(k,v){P[k]=v;
+    out(S.root,'ar',v.toFixed(2));
+    out(S.root,'a2',v.toFixed(2));
+    out(S.root,'i2',(v*v).toFixed(2));
+  }
+  function draw(t){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--cyan'),PK=css('--pink'),V=css('--violet'),AM=css('--amber');
+    const padL=30,gw=w*0.58-padL,cy=h/2;
+    grid(ctx,padL,cy-90,gw,180,gw/16,L);
+    axis(ctx,padL,cy,gw,M,'');
+    // reference wave
+    ctx.strokeStyle=M;ctx.globalAlpha=.4;ctx.lineWidth=1.6;ctx.setLineDash([4,4]);ctx.beginPath();
+    for(let i=0;i<=gw;i++){const yy=cy-60*Math.sin(2*Math.PI*(i/gw*2.5-t*.25));
+      i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+    ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+    ctx.strokeStyle=C;ctx.lineWidth=2.6;ctx.beginPath();
+    for(let i=0;i<=gw;i++){const yy=cy-60*P.ar*Math.sin(2*Math.PI*(i/gw*2.5-t*.25));
+      i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);}
+    ctx.stroke();
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('dashed = original amplitude A₀',padL,20);
+
+    // bars
+    const bx=w*0.66, bw=(w-bx-24)/2-14, base=h-40, top=30;
+    function bar(x,frac,col,lab,val){
+      const hh=Math.min(1,frac/4)*(base-top);
+      ctx.fillStyle=col;ctx.globalAlpha=.85;
+      ctx.fillRect(x,base-hh,bw,hh);ctx.globalAlpha=1;
+      ctx.strokeStyle=col;ctx.lineWidth=1;ctx.strokeRect(x,base-hh,bw,hh);
+      ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';
+      ctx.fillText(lab,x+bw/2,base+16);
+      ctx.fillStyle=col;ctx.font='bold 14px ui-monospace,monospace';
+      ctx.fillText(val,x+bw/2,base-hh-8);
+    }
+    bar(bx,P.ar,C,'amplitude','×'+P.ar.toFixed(2));
+    bar(bx+bw+24,P.ar*P.ar,PK,'intensity','×'+(P.ar*P.ar).toFixed(2));
+    ctx.strokeStyle=L;ctx.setLineDash([3,3]);ctx.beginPath();
+    ctx.moveTo(bx-10,base-(1/4)*(base-top));ctx.lineTo(w-14,base-(1/4)*(base-top));ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('×1',bx-26,base-(1/4)*(base-top)+4);
+  }
+  return {onInput,draw};
+});
+
+/* ============ 5. CRO ============ */
+const croRoot=document.querySelector('[data-sim="cro"]');
+if(croRoot) reg(croRoot,(S)=>{
+  const TB=[[10,'µs'],[50,'µs'],[250,'µs'],[0.5,'ms'],[2,'ms'],[5,'ms'],[10,'ms'],[50,'ms']];
+  const TBs=[10e-6,50e-6,250e-6,0.5e-3,2e-3,5e-3,10e-3,50e-3];
+  const YG=[0.05,0.1,0.2,0.5,1,2];
+  const P={tb:3,yg:2};
+  let cyclesPerScreen=2.5, peakCm=2.5, revealed=false;
+  function randomise(){
+    const opts=[1.5,2,2.5,3,4];
+    cyclesPerScreen=opts[Math.floor(Math.random()*opts.length)];
+    peakCm=[1,1.5,2,2.5,3][Math.floor(Math.random()*5)];
+    revealed=false; show();
+  }
+  function show(){
+    const idx=P.tb, tbv=TBs[idx];
+    const cmPerCycle=8/cyclesPerScreen;
+    const T=cmPerCycle*tbv, f=1/T, amp=peakCm*YG[P.yg];
+    out(S.root,'tb',TB[idx][0]+' '+TB[idx][1]+' cm⁻¹');
+    out(S.root,'yg',YG[P.yg].toFixed(2)+' V cm⁻¹');
+    if(revealed){
+      out(S.root,'ans','1 cycle = '+cmPerCycle.toFixed(2)+' cm  →  T = '+
+        (T>=1e-3?(T*1e3).toFixed(3)+' ms':(T*1e6).toFixed(0)+' µs')+
+        '  →  f = '+(f>=1000?(f/1000).toFixed(2)+' kHz':f.toFixed(0)+' Hz')+
+        '   |   peak = '+peakCm.toFixed(1)+' cm  →  amplitude = '+amp.toFixed(2)+' V'+
+        '   (peak-to-peak = '+(2*amp).toFixed(2)+' V)');
+    } else {
+      out(S.root,'ans','Count the squares. Work out T, f and the amplitude, then press Show answer.');
+    }
+  }
+  function onInput(k,v){P[k]=Math.round(v);show();}
+  function onBtn(a,b){ if(a==='new')randomise(); if(a==='reveal'){revealed=!revealed;b.classList.toggle('on',revealed);show();} }
+  function draw(t){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const L=css('--line'),M=css('--muted'),C=css('--lime');
+    const size=Math.min(w-40,h-30), cell=size/8;
+    const x0=(w-size)/2, y0=(h-size)/2;
+    ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(x0,y0,size,size);
+    // minor
+    ctx.strokeStyle=L;ctx.globalAlpha=.35;ctx.lineWidth=1;ctx.beginPath();
+    for(let i=0;i<=40;i++){const p=x0+i*size/40;ctx.moveTo(p,y0);ctx.lineTo(p,y0+size);
+      const q=y0+i*size/40;ctx.moveTo(x0,q);ctx.lineTo(x0+size,q);}
+    ctx.stroke();ctx.globalAlpha=1;
+    // major
+    ctx.strokeStyle=M;ctx.globalAlpha=.55;ctx.lineWidth=1;ctx.beginPath();
+    for(let i=0;i<=8;i++){const p=x0+i*cell;ctx.moveTo(p,y0);ctx.lineTo(p,y0+size);
+      const q=y0+i*cell;ctx.moveTo(x0,q);ctx.lineTo(x0+size,q);}
+    ctx.stroke();ctx.globalAlpha=1;
+    // centre
+    ctx.strokeStyle=M;ctx.lineWidth=1.4;ctx.beginPath();
+    ctx.moveTo(x0,y0+size/2);ctx.lineTo(x0+size,y0+size/2);ctx.stroke();
+    // trace
+    ctx.strokeStyle=C;ctx.lineWidth=2.4;ctx.shadowColor=C;ctx.shadowBlur=8;ctx.beginPath();
+    for(let i=0;i<=size;i++){
+      const yy=y0+size/2 - peakCm*cell*Math.sin(2*Math.PI*(i/size)*cyclesPerScreen);
+      i?ctx.lineTo(x0+i,yy):ctx.moveTo(x0+i,yy);
+    }
+    ctx.stroke();ctx.shadowBlur=0;
+    // scale key
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('1 large square = 1.0 cm',x0,y0-6);
+    ctx.strokeStyle=M;ctx.lineWidth=1.4;ctx.beginPath();
+    ctx.moveTo(x0+size+8,y0+size-cell);ctx.lineTo(x0+size+8,y0+size);ctx.stroke();
+  }
+  randomise();
+  return {onInput,onBtn,draw};
+});
+
+/* ============ 6. EM SPECTRUM ============ */
+const emRoot=document.querySelector('[data-sim="em"]');
+if(emRoot) reg(emRoot,(S)=>{
+  // log10 lambda from -14 to +4
+  const LO=-14, HI=4;
+  // exact ranges from the syllabus table below — the gaps between them are real,
+  // so the readout falls back to the NEAREST band rather than inventing a boundary.
+  const bands=[
+    {n:'gamma rays',   lo:LO,   hi:-12,  c:'#c084fc', u:'cancer treatment, sterilising, PET scans'},
+    {n:'X-rays',       lo:-11,  hi:-9,   c:'#a78bfa', u:'medical imaging, security scanners'},
+    {n:'ultra-violet', lo:-8,   hi:-6.398,c:'#818cf8',u:'sterilising, fluorescence, suntan'},
+    {n:'visible light',lo:-6.398,hi:-6.155,c:'#4ade80',u:'sight, optical fibres'},
+    {n:'infra-red',    lo:-6.155,hi:-4,  c:'#fb923c', u:'thermal imaging, TV remotes, heaters'},
+    {n:'microwaves',   lo:-3,   hi:-1,   c:'#f472b6', u:'microwave ovens, mobile/satellite signals'},
+    {n:'radio waves',  lo:0,    hi:HI,   c:'#38bdf8', u:'FM radio, TV broadcast'}
+  ];
+  function bandAt(L10){
+    return bands.find(b=>L10>=b.lo&&L10<b.hi)
+      || bands.slice().sort((p,q)=>
+           Math.min(Math.abs(L10-p.lo),Math.abs(L10-p.hi))
+          -Math.min(Math.abs(L10-q.lo),Math.abs(L10-q.hi)))[0];
+  }
+  const P={k:620};
+  function lamOf(k){ return Math.pow(10, LO + (k/1000)*(HI-LO)); }
+  function onInput(key,v){
+    P.k=v; const lam=lamOf(v);
+    let txt;
+    if(lam<1e-9) txt=(lam*1e12).toFixed(0)+' pm';
+    else if(lam<1e-6) txt=(lam*1e9).toFixed(0)+' nm';
+    else if(lam<1e-3) txt=(lam*1e6).toFixed(1)+' µm';
+    else if(lam<1) txt=(lam*1e3).toFixed(1)+' mm';
+    else if(lam<1000) txt=lam.toFixed(2)+' m';
+    else txt=(lam/1000).toFixed(1)+' km';
+    out(S.root,'lam',txt);
+    const f=3e8/lam;
+    const e=Math.floor(Math.log10(f));
+    out(S.root,'f',(f/Math.pow(10,e)).toFixed(1)+' × 10'+String(e).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]||c).join('')+' Hz');
+    const L10=Math.log10(lam);
+    const inBand=bands.some(b=>L10>=b.lo&&L10<b.hi);
+    const b=bandAt(L10);
+    out(S.root,'reg',inBand?b.n:'between bands — nearest is '+b.n); out(S.root,'use',b.u);
+  }
+  function draw(){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted');
+    const padL=24,gw=w-48, by=70, bh=52;
+    const X=(l10)=> padL + (l10-LO)/(HI-LO)*gw;
+    bands.forEach(b=>{
+      const a=Math.max(padL,X(b.lo)), z=Math.min(padL+gw,X(b.hi));
+      if(z<=a) return;
+      ctx.fillStyle=b.c;ctx.globalAlpha=.75;ctx.fillRect(a,by,z-a,bh);ctx.globalAlpha=1;
+      ctx.save();ctx.beginPath();ctx.rect(a,by,z-a,bh);ctx.clip();
+      ctx.fillStyle='#08101a';ctx.font='bold 10px ui-monospace,monospace';ctx.textAlign='center';
+      ctx.fillText(b.n.split(' ')[0],(a+z)/2,by+bh/2+4);ctx.restore();
+    });
+    // ticks
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+    for(let e=LO;e<=HI;e+=2){
+      const x=X(e); if(x<padL-1||x>padL+gw+1)continue;
+      ctx.strokeStyle=M;ctx.globalAlpha=.4;ctx.beginPath();ctx.moveTo(x,by+bh);ctx.lineTo(x,by+bh+6);ctx.stroke();
+      ctx.globalAlpha=1;ctx.fillText('10'+(e<0?'⁻':'')+String(Math.abs(e)).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join(''),x,by+bh+20);
+    }
+    ctx.textAlign='left';ctx.fillText('λ / m',padL,by+bh+38);
+    ctx.textAlign='left';ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';
+    ctx.fillText('shorter λ  ·  higher f  ·  more energetic',padL,34);
+    ctx.textAlign='right';ctx.fillText('longer λ  ·  lower f →',padL+gw,34);
+    // marker
+    const lam=lamOf(P.k), mx=X(Math.log10(lam));
+    ctx.strokeStyle=css('--ink');ctx.lineWidth=2;ctx.beginPath();
+    ctx.moveTo(mx,by-12);ctx.lineTo(mx,by+bh+8);ctx.stroke();
+    ctx.fillStyle=css('--ink');ctx.beginPath();ctx.moveTo(mx,by-12);ctx.lineTo(mx-6,by-22);ctx.lineTo(mx+6,by-22);ctx.fill();
+  }
+  return {onInput,draw};
+});
+
+/* ============ 7. DOPPLER ============ */
+const dopRoot=document.querySelector('[data-sim="doppler"]');
+if(dopRoot) reg(dopRoot,(S)=>{
+  const V=340;
+  const P={vs:60,fs:400};
+  let fronts=[], lastEmit=0, sx=0, last=null, sim=0;
+  function onInput(k,v){
+    P[k]=v;
+    out(S.root,'vs',v.toFixed(0)+' m s⁻¹');
+    out(S.root,'fs',P.fs.toFixed(0)+' Hz');
+    const fo=P.fs*V/(V-P.vs);
+    out(S.root,'fo',(isFinite(fo)&&fo>0?fo.toFixed(0):'—')+' Hz');
+    out(S.root,'dir',P.vs>3?'moving towards the observer → pitch RISES'
+      :P.vs<-3?'moving away from the observer → pitch FALLS':'stationary → no change');
+    const el=S.root.querySelector('[data-out="dir"]');
+    if(el) el.style.color = P.vs>3?css('--lime'):P.vs<-3?css('--pink'):css('--muted');
+  }
+  function draw(t){
+    if(last===null){last=t;sx=0.12;}
+    const dt=Math.min(.05,t-last); last=t; sim+=dt;
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),C=css('--cyan'),PK=css('--pink'),LI=css('--lime'),L=css('--line');
+    const SCALE=w/1400;           // px per metre
+    const cy=h/2, obsX=w-56, y=cy;
+    // move source
+    sx += P.vs*SCALE*dt;
+    if(sx>w-140||sx<40){ sx = P.vs>0?40:w-140; fronts.length=0; }
+    // emit
+    const T=1/(P.fs/40);          // slowed emission for visibility
+    if(sim-lastEmit>T){ lastEmit=sim; fronts.push({x:sx,t:sim}); if(fronts.length>26)fronts.shift(); }
+    // draw fronts
+    fronts.forEach(f=>{
+      const r=(sim-f.t)*V*SCALE;
+      if(r>w) return;
+      ctx.strokeStyle=C;ctx.globalAlpha=Math.max(0,.55-(r/w)*.45);ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.arc(f.x,y,r,0,7);ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+    // track line
+    ctx.strokeStyle=L;ctx.setLineDash([4,5]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(20,y);ctx.lineTo(w-20,y);ctx.stroke();ctx.setLineDash([]);
+    // source
+    ctx.fillStyle=PK;ctx.beginPath();ctx.arc(sx,y,9,0,7);ctx.fill();
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';
+    ctx.fillText('source',sx,y-20);
+    if(Math.abs(P.vs)>3){
+      const d=Math.sign(P.vs);
+      ctx.strokeStyle=PK;ctx.lineWidth=2;ctx.beginPath();
+      ctx.moveTo(sx+d*16,y+22);ctx.lineTo(sx+d*40,y+22);
+      ctx.lineTo(sx+d*33,y+17);ctx.moveTo(sx+d*40,y+22);ctx.lineTo(sx+d*33,y+27);ctx.stroke();
+    }
+    // observer
+    ctx.fillStyle=LI;ctx.beginPath();ctx.arc(obsX,y,8,0,7);ctx.fill();
+    ctx.fillStyle=M;ctx.textAlign='center';ctx.fillText('observer',obsX,y-20);
+    // annotation
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('wavefronts CROWD in front of a source moving towards you  →  shorter λ  →  higher f',20,24);
+    ctx.fillText('and STRETCH out behind it  →  longer λ  →  lower f',20,42);
+    ctx.textAlign='right';
+    ctx.fillText('wave speed is unchanged (340 m s⁻¹) — only λ changes',w-20,h-14);
+  }
+  return {onInput,draw};
+});
+
+/* ============ 8. POLARISATION ============ */
+const polRoot=document.querySelector('[data-sim="pol"]');
+if(polRoot) reg(polRoot,(S)=>{
+  const P={th:0,i0:8};
+  function onInput(k,v){
+    P[k]=v;
+    out(S.root,'th',P.th.toFixed(0)+'°');
+    out(S.root,'i0',P.i0.toFixed(1)+' W m⁻²');
+    const i1=P.i0/2, i2=i1*Math.pow(Math.cos(P.th*Math.PI/180),2);
+    out(S.root,'i1',i1.toFixed(2)+' W m⁻²');
+    out(S.root,'i2',i2.toFixed(2)+' W m⁻²');
+  }
+  function draw(t){
+    const {ctx,w,h}=S;ctx.clearRect(0,0,w,h);
+    const M=css('--muted'),C=css('--cyan'),PK=css('--pink'),V=css('--violet'),
+          L=css('--line'),AM=css('--amber'),LI=css('--lime');
+    const topH=250, cy=110;
+    const th=P.th*Math.PI/180;
+    // beam positions
+    const xA=w*0.30, xB=w*0.62, xEnd=w-42;
+    // unpolarised
+    ctx.strokeStyle=C;ctx.lineWidth=1.4;
+    for(let i=0;i<9;i++){
+      const bx=30+i*((xA-46)/9);
+      const ang=(i*37)%180*Math.PI/180 + t*0.6;
+      ctx.globalAlpha=.75;ctx.beginPath();
+      ctx.moveTo(bx-Math.cos(ang)*13, cy-Math.sin(ang)*13);
+      ctx.lineTo(bx+Math.cos(ang)*13, cy+Math.sin(ang)*13);ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    ctx.fillStyle=M;ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';
+    ctx.fillText('unpolarised',(30+xA)/2,cy+52);
+    ctx.fillText('vibrating in ALL planes',(30+xA)/2,cy+66);
+
+    function filter(x,ang,lab,col){
+      ctx.save();ctx.translate(x,cy);
+      ctx.strokeStyle=col;ctx.lineWidth=2;
+      ctx.beginPath();ctx.ellipse(0,0,20,42,0,0,7);ctx.stroke();
+      ctx.globalAlpha=.12;ctx.fillStyle=col;ctx.fill();ctx.globalAlpha=1;
+      ctx.setLineDash([5,4]);ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(-Math.sin(ang)*20*0+Math.sin(ang)*0, 0);
+      ctx.restore();
+      // transmission axis line (rotated in the plane of the filter)
+      ctx.save();ctx.translate(x,cy);ctx.rotate(ang);
+      ctx.strokeStyle=col;ctx.setLineDash([6,4]);ctx.lineWidth=2.2;
+      ctx.beginPath();ctx.moveTo(0,-44);ctx.lineTo(0,44);ctx.stroke();ctx.setLineDash([]);
+      ctx.restore();
+      ctx.fillStyle=col;ctx.font='11px ui-monospace,monospace';ctx.textAlign='center';
+      ctx.fillText(lab,x,cy-58);
+    }
+    filter(xA,0,'polariser (vertical)',V);
+    filter(xB,th,'analyser  θ = '+P.th.toFixed(0)+'°',AM);
+
+    // polarised beam between filters: vertical
+    ctx.strokeStyle=V;ctx.lineWidth=1.6;
+    for(let i=0;i<6;i++){
+      const bx=xA+26+i*((xB-xA-52)/6);
+      ctx.beginPath();ctx.moveTo(bx,cy-16);ctx.lineTo(bx,cy+16);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(bx-4,cy-12);ctx.lineTo(bx,cy-16);ctx.lineTo(bx+4,cy-12);
+      ctx.moveTo(bx-4,cy+12);ctx.lineTo(bx,cy+16);ctx.lineTo(bx+4,cy+12);ctx.stroke();
+    }
+    ctx.fillStyle=M;ctx.textAlign='center';ctx.font='11px ui-monospace,monospace';
+    ctx.fillText('plane-polarised · ½ I₀',(xA+xB)/2,cy+62);
+
+    // after analyser
+    const c2=Math.pow(Math.cos(th),2);
+    ctx.strokeStyle=AM;ctx.lineWidth=1.6;ctx.globalAlpha=Math.max(.08,c2);
+    for(let i=0;i<4;i++){
+      const bx=xB+26+i*((xEnd-xB-30)/4);
+      ctx.save();ctx.translate(bx,cy);ctx.rotate(th);
+      const amp=16*Math.abs(Math.cos(th));
+      ctx.beginPath();ctx.moveTo(0,-amp);ctx.lineTo(0,amp);ctx.stroke();ctx.restore();
+    }
+    ctx.globalAlpha=1;
+    // meter
+    const mh=90, mx=xEnd-6, my=cy-mh/2;
+    ctx.strokeStyle=L;ctx.lineWidth=1;ctx.strokeRect(mx,my,20,mh);
+    ctx.fillStyle=AM;ctx.fillRect(mx+1,my+mh-c2*mh+1,18,c2*mh-2);
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+    ctx.fillText('I',mx+10,my-6);
+
+    // ---- graph I vs angle ----
+    const gy=h-70, gh=110, padL=44, gw=w-padL-30;
+    ctx.fillStyle=M;ctx.font='12px ui-monospace,monospace';ctx.textAlign='left';
+    ctx.fillText('I against angle as the analyser turns through 360°   —   I = I₁cos²θ',padL,gy-gh-14);
+    grid(ctx,padL,gy-gh,gw,gh,gw/24,L);
+    ctx.strokeStyle=M;ctx.lineWidth=1.4;ctx.beginPath();
+    ctx.moveTo(padL,gy);ctx.lineTo(padL+gw,gy);ctx.moveTo(padL,gy);ctx.lineTo(padL,gy-gh);ctx.stroke();
+    ctx.strokeStyle=AM;ctx.lineWidth=2.4;ctx.beginPath();
+    for(let i=0;i<=gw;i++){
+      const a=i/gw*360*Math.PI/180;
+      const yy=gy-Math.pow(Math.cos(a),2)*gh*0.92;
+      i?ctx.lineTo(padL+i,yy):ctx.moveTo(padL+i,yy);
+    }
+    ctx.stroke();
+    ctx.fillStyle=M;ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';
+    [0,90,180,270,360].forEach(a=>{ctx.fillText(a+'°',padL+a/360*gw,gy+16);});
+    ctx.textAlign='right';ctx.fillText('max',padL-6,gy-gh*0.92+4);ctx.fillText('0',padL-6,gy+4);
+    // marker
+    const mxg=padL+P.th/360*gw;
+    ctx.fillStyle=PK;ctx.beginPath();
+    ctx.arc(mxg,gy-c2*gh*0.92,5,0,7);ctx.fill();
+    ctx.strokeStyle=PK;ctx.setLineDash([2,3]);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(mxg,gy);ctx.lineTo(mxg,gy-gh);ctx.stroke();ctx.setLineDash([]);
+  }
+  return {onInput,draw};
+});
+
+})();
+</script>
+</body>
+</html>
